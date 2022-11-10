@@ -1,7 +1,3 @@
-> **Warning**
-> 
-> This repository is archived. For continued development see: https://github.com/MantisClone/dbs_arweave
-
 # dbs_arweave
 
 A microservice for uploading files to Arweave. To be used with
@@ -250,7 +246,7 @@ requires over 4 WMATIC in the client account (TEST_PRIVATE_KEY).
 
 * Config: https://github.com/MantisClone/arweave-upload/blob/main/.github/workflows/ci_expensive.yml
 
-## Example Curl Commands
+### Example Curl Commands
 
 ```bash
 curl -d '{ "type":"arweave", "userAddress": "0x0000000000000000000000000000000000000000", "files": [{"length": 1048576}, {"length": 256}], "payment": {"chainId": 137, "tokenAddress": "0x0000000000000000000000000000000000000000"} }' -X POST -H 'Content-Type: application/json' http://localhost:8081/getQuote
@@ -262,3 +258,7 @@ curl -d '{ "quoteId":"40acc6937e1bd98631f47e7cbda72920", "signature": "0x0000000
 curl 'http://localhost:8081/getStatus?quoteId=40acc6937e1bd98631f47e7cbda72920'
 curl 'http://localhost:8081/getLink?quoteId=40acc6937e1bd98631f47e7cbda72920&signature=0x0000000000000000000000000000000000000000&nonce=0'
 ```
+
+## History
+
+This codebase is forked from https://github.com/MantisClone/arweave-upload
