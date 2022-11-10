@@ -1,6 +1,6 @@
 {
 	"name": "arweave-upload",
-	"version": "1.0.0",
+	"version": "0.1.0",
 	"description": "A micro-service used by Ocean Protocol for uploading files to Arweave",
 	"main": "server.js",
 	"scripts": {
