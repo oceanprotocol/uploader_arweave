@@ -1,0 +1,32 @@
+provider URL = https://rpc-mumbai.maticvigil.com/
+network = {"name":"maticmum","chainId":80001,"ensAddress":null,"_defaultProvider":null}
+server wallet address = 0x7eB023BFbAeE228de6DC5B92D0BeEB1eDb1Fd567
+user wallet address = 0x519145B771a6e450461af89980e5C17Ff6Fd8A92
+payment token address = 0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889
+userBalance = 2263575201296058034
+serverBalance = 1007679252760916590
+Waiting for approval...
+transferFromEstimate = 40596
+unwrapEstimate = 36054
+sendEthEstimate = 21000
+wrapEstimate = 26116
+transferEstimate = 34539
+gasEstimate = 158305
+Waiting for revoke...
+
+provider URL = https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161
+network = {"name":"goerli","chainId":5,"ensAddress":"0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e"}
+server wallet address = 0x7eB023BFbAeE228de6DC5B92D0BeEB1eDb1Fd567
+user wallet address = 0x519145B771a6e450461af89980e5C17Ff6Fd8A92
+payment token address = 0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6
+userBalance = 100000000000000000
+serverBalance = 100000000000000000
+Waiting for approval...
+transferFromEstimate = 40833
+unwrapEstimate = 36081
+sendEthEstimate = 21000
+wrapEstimate = 26166
+transferEstimate = 34671
+gasEstimate = 158751
+Waiting for revoke...
+

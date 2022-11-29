@@ -1,0 +1,53 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Node.js CI (Expensive)
+
+on:
+  schedule:
+    - cron: '0 8 1 1,4,7,10 *' # 8:00 AM, Quarterly
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Clean install
+      run: npm ci
+
+    - name: Run tests
+      run: |
+        npm start 2>&1 &
+        sleep 2
+        npm test -- -grep "upload, with large file"
+      env:
+        # Server env vars
+        ACCEPTED_PAYMENTS: ethereum,matic
+        NODE_RPC_URIS: default,default
+        BUNDLR_URI: https://devnet.bundlr.network
+        PORT: 8081
+        PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+        SQLITE_DB_PATH: db
+        REGISTRATION_INTERVAL: 300000
+        DBS_URI: DEBUG
+        SELF_URI: https://localhost
+        IPFS_GATEWAY: https://cloudflare-ipfs.com/ipfs/
+        ARWEAVE_GATEWAY: https://arweave.net/
+        MAX_UPLOAD_SIZE: 1099511627776
+        # Test env var
+        TEST_PRIVATE_KEY: ${{ secrets.TEST_PRIVATE_KEY }}
+        ENABLE_EXPENSIVE_TESTS: "true"
