@@ -45,7 +45,7 @@ jobs:
         ACCEPTED_PAYMENTS: ethereum,matic
         NODE_RPC_URIS: default,default
         BUNDLR_URI: https://devnet.bundlr.network
-        PORT: 8081
+        ARWEAVE_DBS_PORT: 8081
         PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
         SQLITE_DB_PATH: db
         REGISTRATION_INTERVAL: 300000
