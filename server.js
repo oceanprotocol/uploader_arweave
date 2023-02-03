@@ -61,7 +61,7 @@ const register = () => {
 	axios.post(`${process.env.DBS_URI}/register`, {
 		type: "arweave",
 		description: "File storage on Arweave",
-		url: process.env.SELF_URI,
+		url: process.env.SELF_URI + ":" + PORT + "/",
 		payment: getAcceptedPaymentDetails(),
 	})
 	.then((response) => {
