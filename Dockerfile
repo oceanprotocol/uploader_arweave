@@ -4,7 +4,6 @@ FROM node:16
 WORKDIR /usr/src/app
 
 # Install app dependencies
-# where available (npm@5+)
 COPY package.json package-lock.json ./
 
 # If you are building your code for production
