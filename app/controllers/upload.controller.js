@@ -70,7 +70,7 @@ exports.upload = async (req, res) => {
 		errorResponse(req, res, null, 400, "Missing nonce.");
 		return;
 	}
-	if(typeof nonce !== "number") {
+	if(typeof nonce !== "string") {
 		errorResponse(req, res, null, 400, "Invalid nonce.");
 		return;
 	}

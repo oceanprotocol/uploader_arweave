@@ -330,7 +330,7 @@ exports.getLink = async (req, res) => {
 		return;
 	}
 	if(typeof nonce !== "string") {
-		errorResponse(req, res, null, 400, "Invalid nonce.");
+		errorResponse(req, res, null, 400, "Nonce is not a string: " + nonce);
 		return;
 	}
 
@@ -387,7 +387,7 @@ exports.getLink = async (req, res) => {
 		return;
 	}
 	if(parseFloat(nonce) <= parseFloat(oldNonce)) {
-		errorResponse(req, res, null, 403, "Invalid nonce.");
+		errorResponse(req, res, null, 403, "Error with the nonce (" + nonce + ") being smaller than the old one: " + oldNonce);
 		return;
 	}
 	try {
