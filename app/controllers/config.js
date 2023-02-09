@@ -72,9 +72,9 @@ const checkConfig = () => {
 		return false;
 	}
 
-	const port = process.env.PORT;
+	const port = process.env.ARWEAVE_DBS_PORT;
 	if(port != null && isNaN(port)) {
-		console.log("PORT environment variable should be a number");
+		console.log("ARWEAVE_DBS_PORT environment variable should be a number");
 		return false;
 	}
 

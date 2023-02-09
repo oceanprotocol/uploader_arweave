@@ -40,7 +40,7 @@ require("./app/routes/quote.routes.js")(app);
 require("./app/routes/upload.routes.js")(app);
 
 // set port, listen for requests
-const PORT = process.env.PORT || 8081;
+const PORT = process.env.ARWEAVE_DBS_PORT || 8081;
 app.listen(PORT, "localhost", () => {
 	console.log(`API Server is running at http://localhost:${PORT}/`);
 	const wallet = new ethers.Wallet(process.env.PRIVATE_KEY);
@@ -61,7 +61,7 @@ const register = () => {
 	axios.post(`${process.env.DBS_URI}/register`, {
 		type: "arweave",
 		description: "File storage on Arweave",
-		url: process.env.SELF_URI,
+		url: process.env.SELF_URI + ":" + PORT + "/",
 		payment: getAcceptedPaymentDetails(),
 	})
 	.then((response) => {
