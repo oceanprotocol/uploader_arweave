@@ -103,15 +103,21 @@ exports.upload = async (req, res) => {
 	const message = ethers.utils.sha256(ethers.utils.toUtf8Bytes(quoteId + nonce.toString()));
 	let signerAddress;
 	try {
+		console.log(`Hashed message: ${message}`)
+		console.log(`Signature: ${signature}`)
 		signerAddress = ethers.utils.verifyMessage(message, signature);
+
+		console.log(`signerAddress: ${signerAddress}`)
 	}
 	catch(err) {
-		errorResponse(req, res, err, 403, "Invalid signature.");
+		console.log(`userAddress and message for signature ${userAddress} : ${message}`);
+		errorResponse(req, res, err, 403, err);
 		return;
 	}
 
 	if(signerAddress != userAddress) {
-		errorResponse(req, res, null, 403, "Invalid signature.");
+		console.log(`userAddress and message for signature ${signerAddress} : ${userAddress}`);
+		errorResponse(req, res, 'Invalid Signature.', 400, `userAddress and message for signature ${signerAddress} : ${userAddress}`);
 		return;
 	}
 
