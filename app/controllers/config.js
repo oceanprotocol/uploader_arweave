@@ -60,11 +60,6 @@ const checkConfig = () => {
 		console.log("PRIVATE_KEY environment variable not set");
 		return false;
 	}
-	const keyRegex = /^[0-9A-F]{64,}$/i;
-	if(!keyRegex.test(privateKey)) {
-		console.log("PRIVATE_KEY environment variable has invalid format");
-		return false;
-	}
 
 	const sqlitePath = process.env.SQLITE_DB_PATH;
 	if(sqlitePath == null) {
