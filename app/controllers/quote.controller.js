@@ -414,3 +414,27 @@ exports.getLink = async (req, res) => {
 	console.log(`${req.path} response: 200: ${JSON.stringify(link)}`);
 	res.send(link);
 };
+
+exports.getHistory = async (req, res) => {
+	console.log(`getHistory request: ${JSON.stringify(req.query)}`)
+
+	if(!req.query || !req.query.userAddress) {
+		errorResponse(req, res, null, 400, "Error, userAddress required.");
+		return;
+	}
+	const userAddress = req.query.userAddress;
+
+	try {
+		const history = Quote.getHistory(userAddress);
+		if(history == undefined) {
+			errorResponse(req, res, null, 404, "History not found.");
+			return;
+		}
+		console.log('history: ', history);
+		console.log(`${req.path} response: 200: ${JSON.stringify(history)}`);
+		res.send(history);
+	}
+	catch(err) {
+		errorResponse(req, res, err, 500, "Error occurred while looking up status.");
+	}
+};

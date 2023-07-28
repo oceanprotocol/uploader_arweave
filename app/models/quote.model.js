@@ -102,4 +102,14 @@ Quote.getLink = (quoteId) => {
 	return sql.prepare(query).all([quoteId]);
 };
 
+Quote.getHistory = (userAddress) => {
+	const query = `
+	SELECT q.quoteId, q.status, q.chainId, q.tokenAddress, q.tokenAmount, q.approveAddress, f.transactionHash
+	FROM quote q
+	INNER JOIN files f ON q.quoteId = f.quoteId
+	WHERE q.userAddress = ?;`;
+
+	return sql.prepare(query).get([userAddress]);
+};
+
 module.exports = Quote;

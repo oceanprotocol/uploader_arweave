@@ -4,4 +4,5 @@ module.exports = app => {
 	app.post("/getQuote", quote.create);
 	app.get("/getStatus", quote.getStatus);
 	app.get("/getLink", quote.getLink);
+	app.get("/getHistory", quote.getHistory);
 };
