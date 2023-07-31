@@ -443,7 +443,7 @@ exports.getHistory = async (req, res) => {
 	}
 
 	const userAddress = req.query.userAddress;
-	const message = ethers.utils.sha256(ethers.utils.toUtf8Bytes(userAddress + nonce.toString()));
+	const message = ethers.utils.sha256(ethers.utils.toUtf8Bytes('' + nonce.toString()));
 	let signerAddress;
 	try {
 		signerAddress = ethers.utils.verifyMessage(message, signature);
