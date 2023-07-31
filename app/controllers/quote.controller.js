@@ -422,7 +422,41 @@ exports.getHistory = async (req, res) => {
 		errorResponse(req, res, null, 400, "Error, userAddress required.");
 		return;
 	}
+	const nonce = req.query.nonce;
+	if(typeof nonce === "undefined") {
+		errorResponse(req, res, null, 400, "Missing nonce.");
+		return;
+	}
+	if(typeof nonce !== "string") {
+		errorResponse(req, res, null, 400, "Invalid nonce.");
+		return;
+	}
+
+	const signature = req.query.signature;
+	if(typeof signature === "undefined") {
+		errorResponse(req, res, null, 400, "Missing signature.");
+		return;
+	}
+	if(typeof signature !== "string") {
+		errorResponse(req, res, null, 400, "Invalid signature format.");
+		return;
+	}
+
 	const userAddress = req.query.userAddress;
+	const message = ethers.utils.sha256(ethers.utils.toUtf8Bytes(userAddress + nonce.toString()));
+	let signerAddress;
+	try {
+		signerAddress = ethers.utils.verifyMessage(message, signature);
+	}
+	catch(err) {
+		errorResponse(req, res, err, 403, "Invalid signature.");
+		return;
+	}
+
+	if(signerAddress != userAddress) {
+		errorResponse(req, res, null, 403, "Invalid signature.");
+		return;
+	}
 
 	try {
 		const history = Quote.getHistory(userAddress);
