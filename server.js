@@ -57,17 +57,13 @@ app.listen(PORT, "0.0.0.0", () => {
 });
 
 const register = () => {
-	console.log("Registering with DBS...")
 	axios.post(`${process.env.DBS_URI}/register`, {
 		type: "arweave",
 		description: "File storage on Arweave",
 		url: process.env.SELF_URI,
 		payment: getAcceptedPaymentDetails(),
 	})
-	.then((response) => {
-		console.log(response);
-	})
 	.catch((error) => {
-		console.error(error);
+		console.error('Error registering with DBS:', error);
 	})
 }
