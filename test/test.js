@@ -215,6 +215,36 @@ describe("DBS Arweave Upload", function () {
                 );
             });
 
+            it("getHistory, after successful upload, should return a list of assets", async function() {
+                const getQuoteResponse = await getQuote(userWallet).catch((err) => err.response);
+                const quote = getQuoteResponse.data;
+                const token = new ethers.Contract(quote.tokenAddress, abi, userWallet);
+
+                await (await token.approve(quote.approveAddress, ethers.constants.MaxInt256)).wait();
+
+                let nonce = Math.floor(new Date().getTime()) / 1000;
+                let message = ethers.utils.sha256(ethers.utils.toUtf8Bytes(quote.quoteId + nonce.toString()));
+                let signature = await userWallet.signMessage(message);
+                const uploadResponse = await axios.post(`http://localhost:8081/upload`, {
+                    quoteId: quote.quoteId,
+                    files: ["ipfs://bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi", "ipfs://QmZ4tDuvesekSs4qM5ZBKpXiZGun7S2CYtEZRB3DYXkjGx"],
+                    nonce: nonce,
+                    signature: signature,
+                }).catch((err) => err.response);
+                expect(uploadResponse.status).equals(200);
+                expect(uploadResponse.data).equals('');
+
+                const status = await waitForUpload(timeoutSeconds, quote.quoteId);
+                expect(status).equals(Quote.QUOTE_STATUS_UPLOAD_END);
+
+                nonce = Math.floor(new Date().getTime()) / 1000;
+                message = ethers.utils.sha256(ethers.utils.toUtf8Bytes('' + nonce.toString()));
+                signature = await userWallet.signMessage(message);
+                const getHistoryResponse = await axios.get(`http://localhost:8081/getHistory?userAddress=${userWallet.address}&nonce=${nonce}&signature=${signature}`);
+                expect(getHistoryResponse.status).to.equal(200);
+                console.log('getHistoryResponse: ', getHistoryResponse);
+            });
+
             it("upload, with large file, should successfully upload file to arweave", async function() {
                 if (process.env.ENABLE_EXPENSIVE_TESTS == "true") {
                     const timeoutSeconds = 3600;
