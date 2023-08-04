@@ -3,6 +3,21 @@
 A microservice for uploading files to Arweave. To be used with
 [Ocean Protocol Decentralized Storage Backend](https://github.com/oceanprotocol/decentralized_storage_backend).
 
+- [🔌 Endpoints](#endpoints)
+  - [🏷️ getQuote](#getquote)
+  - [⬆️ upload](#upload)
+  - [🔄 getStatus](#getstatus)
+  - [🔗 getLink](#getlink)
+- [✅ Register](#register)
+- [💾 Install](#install)
+- [▶️ Run](#run)
+- [🧪 Test](#test)
+  - [✋ Manual tests](#manual-tests)
+  - [🤖 Automated tests](#automated-tests)
+  - [📦 Expensive, large upload test](#expensive-large-upload-test)
+  - [🖥️ Example Curl Commands](#example-curl-commands)
+
+
 ## Endpoints
 
 ### getQuote
