@@ -259,6 +259,3 @@ curl 'http://localhost:8081/getStatus?quoteId=40acc6937e1bd98631f47e7cbda72920'
 curl 'http://localhost:8081/getLink?quoteId=40acc6937e1bd98631f47e7cbda72920&signature=0x0000000000000000000000000000000000000000&nonce=0'
 ```
 
-## History
-
-This codebase is forked from https://github.com/MantisClone/arweave-upload
