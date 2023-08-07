@@ -313,7 +313,7 @@ This project is fully open-source, backed by the OCEAN community and is open for
 
 ## License
 
-Released under the Apache License.
+Released under the Apache 2.0 License.
 
 ## Associated Projects
 
