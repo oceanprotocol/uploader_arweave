@@ -3,6 +3,47 @@
 A microservice for uploading files to Arweave. To be used with
 [Ocean Protocol Decentralized Storage Backend](https://github.com/oceanprotocol/decentralized_storage_backend).
 
+- [🔌 Endpoints](#endpoints)
+  - [🏷️ getQuote](#getquote)
+  - [⬆️ upload](#upload)
+  - [🔄 getStatus](#getstatus)
+  - [🔗 getLink](#getlink)
+- [✅ Register](#register)
+- [💾 Install](#install)
+- [▶️ Run](#run)
+- [🧪 Test](#test)
+  - [✋ Manual tests](#manual-tests)
+  - [🤖 Automated tests](#automated-tests)
+  - [📦 Expensive, large upload test](#expensive-large-upload-test)
+  - [🖥️ Example Curl Commands](#example-curl-commands)
+
+## Getting Started
+
+Clone the repository and navigate to the project directory:
+
+```bash
+git clone https://github.com/MantisClone/arweave-upload.git
+cd arweave-upload
+```
+
+Make sure that you have a compatible version of node.js installed (as specified in `.nvmrc`). We recommend running:
+
+```
+nvm use
+```
+
+Install the necessary dependencies:
+
+```
+npm install
+```
+
+Start the server using:
+
+```
+npm start
+```
+
 ## Endpoints
 
 ### getQuote
@@ -259,6 +300,3 @@ curl 'http://localhost:8081/getStatus?quoteId=40acc6937e1bd98631f47e7cbda72920'
 curl 'http://localhost:8081/getLink?quoteId=40acc6937e1bd98631f47e7cbda72920&signature=0x0000000000000000000000000000000000000000&nonce=0'
 ```
 
-## History
-
-This codebase is forked from https://github.com/MantisClone/arweave-upload
