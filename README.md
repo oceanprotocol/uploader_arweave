@@ -309,9 +309,7 @@ Stay tuned for more integrations and services. Follow the issues on github to se
 
 ## Contributing
 
-This project is fully open-source, backed by the $OCEAN community and is obviously open for contributions.
-
-The first version has been implemented following the TDD strategy, so please first familiarize yourself with the test suite, which can be run using the `./manage.py test` command, directly from the root of your server in the context of your virtual environment.
+This project is fully open-source, backed by the OCEAN community and is open for contributions.
 
 ## License
 
