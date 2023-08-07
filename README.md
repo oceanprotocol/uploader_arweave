@@ -15,6 +15,11 @@ A microservice for uploading files to Arweave. To be used with
   - [🤖 Automated tests](#automated-tests)
   - [📦 Expensive, large upload test](#expensive-large-upload-test)
   - [🖥️ Example Curl Commands](#example-curl-commands)
+- [🤝 Support](#support)
+- [🗺 Roadmap](#roadmap)
+- [🤖 Contributing](#contributing)
+- [📜 License](#license)
+- [🔗 Associated Projects](#associated-projects)
 
 ## Getting Started
 
@@ -293,3 +298,26 @@ curl 'http://localhost:8081/getStatus?quoteId=40acc6937e1bd98631f47e7cbda72920'
 curl 'http://localhost:8081/getLink?quoteId=40acc6937e1bd98631f47e7cbda72920&signature=0x0000000000000000000000000000000000000000&nonce=0'
 ```
 
+## Support
+
+Please open issues on github if you need support of have any questions.
+
+## Roadmap
+
+Stay tuned for more integrations and services. Follow the issues on github to see the latest development plans.  
+
+
+## Contributing
+
+This project is fully open-source, backed by the $OCEAN community and is obviously open for contributions.
+
+The first version has been implemented following the TDD strategy, so please first familiarize yourself with the test suite, which can be run using the `./manage.py test` command, directly from the root of your server in the context of your virtual environment.
+
+## License
+
+Released under the Apache License.
+
+## Associated Projects
+
+- [DBS Filecoin microservice](https://github.com/oceanprotocol/dbs_filecoin)
+- [OCEAN Decentralized Backend Storage](https://github.com/oceanprotocol/decentralized_storage_backend)
