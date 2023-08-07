@@ -9,7 +9,6 @@ A microservice for uploading files to Arweave. To be used with
   - [🔄 getStatus](#getstatus)
   - [🔗 getLink](#getlink)
 - [✅ Register](#register)
-- [💾 Install](#install)
 - [▶️ Run](#run)
 - [🧪 Test](#test)
   - [✋ Manual tests](#manual-tests)
@@ -213,12 +212,6 @@ POST  DBS_URI/register
                 }
             ]
 }
-```
-
-## Install
-
-```bash
-npm install
 ```
 
 ## Run
