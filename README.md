@@ -3,6 +3,51 @@
 A microservice for uploading files to Arweave. To be used with
 [Ocean Protocol Decentralized Storage Backend](https://github.com/oceanprotocol/decentralized_storage_backend).
 
+- [🔌 Endpoints](#endpoints)
+  - [🏷️ getQuote](#getquote)
+  - [⬆️ upload](#upload)
+  - [🔄 getStatus](#getstatus)
+  - [🔗 getLink](#getlink)
+- [✅ Register](#register)
+- [▶️ Run](#run)
+- [🧪 Test](#test)
+  - [✋ Manual tests](#manual-tests)
+  - [🤖 Automated tests](#automated-tests)
+  - [📦 Expensive, large upload test](#expensive-large-upload-test)
+  - [🖥️ Example Curl Commands](#example-curl-commands)
+- [🤝 Support](#support)
+- [🗺 Roadmap](#roadmap)
+- [🤖 Contributing](#contributing)
+- [📜 License](#license)
+- [🔗 Associated Projects](#associated-projects)
+
+## Getting Started
+
+Clone the repository and navigate to the project directory:
+
+```bash
+git clone https://github.com/oceanprotocol/dbs_arweave.git
+cd arweave-upload
+```
+
+Make sure that you have a compatible version of node.js installed (as specified in `.nvmrc`). We recommend running:
+
+```
+nvm use
+```
+
+Install the necessary dependencies:
+
+```
+npm install
+```
+
+Start the server using:
+
+```
+npm start
+```
+
 ## Endpoints
 
 ### getQuote
@@ -174,12 +219,6 @@ POST  DBS_URI/register
 }
 ```
 
-## Install
-
-```bash
-npm install
-```
-
 ## Run
 
 ```bash
@@ -259,6 +298,24 @@ curl 'http://localhost:8081/getStatus?quoteId=40acc6937e1bd98631f47e7cbda72920'
 curl 'http://localhost:8081/getLink?quoteId=40acc6937e1bd98631f47e7cbda72920&signature=0x0000000000000000000000000000000000000000&nonce=0'
 ```
 
-## History
+## Support
 
-This codebase is forked from https://github.com/MantisClone/arweave-upload
+Please open issues on github if you need support of have any questions.
+
+## Roadmap
+
+Stay tuned for more integrations and services. Follow the issues on github to see the latest development plans.  
+
+
+## Contributing
+
+This project is fully open-source, backed by the OCEAN community and is open for contributions.
+
+## License
+
+Released under the Apache 2.0 License.
+
+## Associated Projects
+
+- [DBS Filecoin microservice](https://github.com/oceanprotocol/dbs_filecoin)
+- [OCEAN Decentralized Backend Storage](https://github.com/oceanprotocol/decentralized_storage_backend)

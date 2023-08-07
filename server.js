@@ -57,17 +57,23 @@ app.listen(PORT, "0.0.0.0", () => {
 });
 
 const register = () => {
-	console.log("Registering with DBS...")
+	const baseURL = new URL(process.env.SELF_URI);
+	if (!baseURL.port) {
+		baseURL.port = PORT || 8081;
+	}
+	const url = baseURL.toString();
+	console.log(`Registering with DBS at ${process.env.DBS_URI} as ${url}`);
+
 	axios.post(`${process.env.DBS_URI}/register`, {
 		type: "arweave",
 		description: "File storage on Arweave",
-		url: process.env.SELF_URI,
+		url,
 		payment: getAcceptedPaymentDetails(),
 	})
 	.then((response) => {
-		console.log(response);
+		console.log("Successfully registered with DBS:", response.data);
 	})
 	.catch((error) => {
-		console.error(error);
+		console.error("Error while registering with DBS:", error);
 	})
 }

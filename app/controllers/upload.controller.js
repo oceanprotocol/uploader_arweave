@@ -65,12 +65,14 @@ exports.upload = async (req, res) => {
 		}
 	}
 
-	const nonce = req.body.nonce;
-	if(typeof nonce === "undefined") {
+	if (typeof req.body.nonce === "undefined") {
 		errorResponse(req, res, null, 400, "Missing nonce.");
 		return;
 	}
-	if(typeof nonce !== "number") {
+	
+	const nonce = Number(req.body.nonce);
+	
+	if (isNaN(nonce)) {
 		errorResponse(req, res, null, 400, "Invalid nonce.");
 		return;
 	}
