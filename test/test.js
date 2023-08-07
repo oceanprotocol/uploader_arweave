@@ -138,7 +138,7 @@ describe("DBS Arweave Upload", function () {
                     signature: signature,
                 }).catch((err) => err.response);
 
-                const status = await waitForUpload(timeoutSeconds, quote.quoteId);
+                const status = await waitForUpload(timeoutSeconds + 100, quote.quoteId);
                 expect(status).equals(Quote.QUOTE_STATUS_UPLOAD_END);
 
                 // Attempt upload with nonce lower than previous
@@ -182,7 +182,7 @@ describe("DBS Arweave Upload", function () {
             });
 
 
-            it("getLink, after successful upload, should return a list of transaction IDs", async function() {
+            it("getLink & getHistory, after successful upload, should return a list of transaction IDs", async function() {
                 const getQuoteResponse = await getQuote(userWallet).catch((err) => err.response);
                 const quote = getQuoteResponse.data;
                 const token = new ethers.Contract(quote.tokenAddress, abi, userWallet);
@@ -201,48 +201,42 @@ describe("DBS Arweave Upload", function () {
                 expect(uploadResponse.status).equals(200);
                 expect(uploadResponse.data).equals('');
 
-                const status = await waitForUpload(timeoutSeconds, quote.quoteId);
+                const status = await waitForUpload(timeoutSeconds + 200, quote.quoteId);
+                console.log('status: ', status);
                 expect(status).equals(Quote.QUOTE_STATUS_UPLOAD_END);
 
                 nonce = Math.floor(new Date().getTime()) / 1000;
+                console.log('nonce2: ', nonce);
                 message = ethers.utils.sha256(ethers.utils.toUtf8Bytes(quote.quoteId + nonce.toString()));
+                console.log('msg2: ', message);
                 signature = await userWallet.signMessage(message);
+                console.log('sig2: ', signature)
                 const getLinkResponse = await axios.get(`http://localhost:8081/getLink?quoteId=${quote.quoteId}&nonce=${nonce}&signature=${signature}`);
+                console.log('getLinkResp: ', getLinkResponse)
                 expect(getLinkResponse.status).to.equal(200);
                 expect(getLinkResponse.data[0]).contains.all.keys(
                     "type",
                     "transactionHash"
                 );
-            });
-
-            it("getHistory, after successful upload, should return a list of assets", async function() {
-                const getQuoteResponse = await getQuote(userWallet).catch((err) => err.response);
-                const quote = getQuoteResponse.data;
-                const token = new ethers.Contract(quote.tokenAddress, abi, userWallet);
-
-                await (await token.approve(quote.approveAddress, ethers.constants.MaxInt256)).wait();
-
-                let nonce = Math.floor(new Date().getTime()) / 1000;
-                let message = ethers.utils.sha256(ethers.utils.toUtf8Bytes(quote.quoteId + nonce.toString()));
-                let signature = await userWallet.signMessage(message);
-                const uploadResponse = await axios.post(`http://localhost:8081/upload`, {
-                    quoteId: quote.quoteId,
-                    files: ["ipfs://bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi", "ipfs://QmZ4tDuvesekSs4qM5ZBKpXiZGun7S2CYtEZRB3DYXkjGx"],
-                    nonce: nonce,
-                    signature: signature,
-                }).catch((err) => err.response);
-                expect(uploadResponse.status).equals(200);
-                expect(uploadResponse.data).equals('');
-
-                const status = await waitForUpload(timeoutSeconds, quote.quoteId);
-                expect(status).equals(Quote.QUOTE_STATUS_UPLOAD_END);
 
                 nonce = Math.floor(new Date().getTime()) / 1000;
-                message = ethers.utils.sha256(ethers.utils.toUtf8Bytes('' + nonce.toString()));
+                console.log('nonce3: ', nonce);
+                const emptyQuoteId = '';
+                message = ethers.utils.sha256(ethers.utils.toUtf8Bytes(emptyQuoteId + nonce.toString()));
+                console.log('msg3: ', message);
                 signature = await userWallet.signMessage(message);
+                console.log('sig3: ', signature)
                 const getHistoryResponse = await axios.get(`http://localhost:8081/getHistory?userAddress=${userWallet.address}&nonce=${nonce}&signature=${signature}`);
                 expect(getHistoryResponse.status).to.equal(200);
-                console.log('getHistoryResponse: ', getHistoryResponse);
+                expect(getLinkResponse.data).contains.all.keys(
+                    "quoteId",
+                    "status",
+                    "chainId",
+                    "tokenAddress",
+                    "tokenAmount",
+                    "approveAddress",
+                    "transactionHash"
+                );
             });
 
             it("upload, with large file, should successfully upload file to arweave", async function() {

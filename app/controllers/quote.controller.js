@@ -458,13 +458,32 @@ exports.getHistory = async (req, res) => {
 		return;
 	}
 
+	let oldNonce;
+	try {
+		oldNonce = Nonce.get(userAddress)?.nonce || 0.0;
+	}
+	catch(err) {
+		errorResponse(req, res, err, 500, "Error occurred while validating nonce.");
+		return;
+	}
+	if(parseFloat(nonce) <= parseFloat(oldNonce)) {
+		errorResponse(req, res, null, 403, "Invalid nonce.");
+		return;
+	}
+	try {
+		Nonce.set(userAddress, nonce);
+	}
+	catch(err) {
+		errorResponse(req, res, err, 500, "Error occurred while setting nonce.");
+		return;
+	}
+
 	try {
 		const history = Quote.getHistory(userAddress);
 		if(history == undefined) {
 			errorResponse(req, res, null, 404, "History not found.");
 			return;
 		}
-		console.log('history: ', history);
 		console.log(`${req.path} response: 200: ${JSON.stringify(history)}`);
 		res.send(history);
 	}
