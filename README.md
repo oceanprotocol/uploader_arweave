@@ -17,6 +17,32 @@ A microservice for uploading files to Arweave. To be used with
   - [📦 Expensive, large upload test](#expensive-large-upload-test)
   - [🖥️ Example Curl Commands](#example-curl-commands)
 
+## Getting Started
+
+Clone the repository and navigate to the project directory:
+
+```bash
+git clone https://github.com/MantisClone/arweave-upload.git
+cd arweave-upload
+```
+
+Make sure that you have a compatible version of node.js installed (as specified in `.nvmrc`). We recommend running:
+
+```
+nvm use
+```
+
+Install the necessary dependencies:
+
+```
+npm install
+```
+
+Start the server using:
+
+```
+npm start
+```
 
 ## Endpoints
 
