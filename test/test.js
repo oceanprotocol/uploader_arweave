@@ -202,17 +202,12 @@ describe("DBS Arweave Upload", function () {
                 expect(uploadResponse.data).equals('');
 
                 const status = await waitForUpload(timeoutSeconds + 200, quote.quoteId);
-                console.log('status: ', status);
                 expect(status).equals(Quote.QUOTE_STATUS_UPLOAD_END);
 
                 nonce = Math.floor(new Date().getTime()) / 1000;
-                console.log('nonce2: ', nonce);
                 message = ethers.utils.sha256(ethers.utils.toUtf8Bytes(quote.quoteId + nonce.toString()));
-                console.log('msg2: ', message);
                 signature = await userWallet.signMessage(message);
-                console.log('sig2: ', signature)
                 const getLinkResponse = await axios.get(`http://localhost:8081/getLink?quoteId=${quote.quoteId}&nonce=${nonce}&signature=${signature}`);
-                console.log('getLinkResp: ', getLinkResponse)
                 expect(getLinkResponse.status).to.equal(200);
                 expect(getLinkResponse.data[0]).contains.all.keys(
                     "type",
@@ -220,15 +215,12 @@ describe("DBS Arweave Upload", function () {
                 );
 
                 nonce = Math.floor(new Date().getTime()) / 1000;
-                console.log('nonce3: ', nonce);
                 const emptyQuoteId = '';
                 message = ethers.utils.sha256(ethers.utils.toUtf8Bytes(emptyQuoteId + nonce.toString()));
-                console.log('msg3: ', message);
                 signature = await userWallet.signMessage(message);
-                console.log('sig3: ', signature)
                 const getHistoryResponse = await axios.get(`http://localhost:8081/getHistory?userAddress=${userWallet.address}&nonce=${nonce}&signature=${signature}`);
                 expect(getHistoryResponse.status).to.equal(200);
-                expect(getLinkResponse.data).contains.all.keys(
+                expect(getHistoryResponse.data[0]).contains.all.keys(
                     "quoteId",
                     "status",
                     "chainId",

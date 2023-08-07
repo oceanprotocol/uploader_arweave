@@ -108,11 +108,6 @@ Quote.getHistory = (userAddress) => {
 	FROM quote
 	INNER JOIN files ON quote.quoteId = files.quoteId
 	WHERE quote.userAddress = ?;`;
-	const query1 = `
-	SELECT *
-	FROM files;
-	`;
-	console.log('query 1: ', sql.prepare(query1).run());
 
 	return sql.prepare(query).all([userAddress]);
 };

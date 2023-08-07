@@ -8,6 +8,7 @@ A microservice for uploading files to Arweave. To be used with
   - [⬆️ upload](#upload)
   - [🔄 getStatus](#getstatus)
   - [🔗 getLink](#getlink)
+  - [📜 getHistory](#gethistory)
 - [✅ Register](#register)
 - [▶️ Run](#run)
 - [🧪 Test](#test)
@@ -180,6 +181,44 @@ Returns:
 [
     {
        "type": "arweave",
+       "transactionHash": "xxxx"
+    }
+]
+```
+
+### getHistory
+Description: Gets history quotes for a certain user
+
+Path: GET /getHistory?userAddress=xxx&nonce=1&signature=0xXXXXX
+
+Input:
+
+```json
+{
+    "userAddress": "0x1234",
+    "nonce": 12345.12345,
+    "signature": "0x2222"
+}
+
+```
+
+Where:
+
+- userAddress: wallet address
+- nonce: (timestamp) (has to be higher then previous stored nonce for this user)
+- signature: user signed hash of SHA256(''+nonce)
+
+Returns:
+
+```json
+[
+    {
+       "quoteId": "arweave",
+       "status": 400,
+       "chainId": 80001,
+       "tokenAddress": "0x222",
+       "tokenAmount": "999999999",
+       "approveAddress": "0x1234",
        "transactionHash": "xxxx"
     }
 ]
