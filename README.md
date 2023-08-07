@@ -26,7 +26,7 @@ A microservice for uploading files to Arweave. To be used with
 Clone the repository and navigate to the project directory:
 
 ```bash
-git clone https://github.com/MantisClone/arweave-upload.git
+git clone https://github.com/oceanprotocol/dbs_arweave.git
 cd arweave-upload
 ```
 
