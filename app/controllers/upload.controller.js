@@ -29,7 +29,7 @@ exports.upload = async (req, res) => {
 		return;
 	}
 
-	const files = req.body.files;
+	const files = typeof req.body.files === 'string' ? [req.body.files] : req.body.files;
 	if(typeof files === "undefined") {
 		errorResponse(req, res, null, 400, "Missing files field.");
 		return;
