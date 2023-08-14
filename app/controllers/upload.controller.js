@@ -7,7 +7,7 @@ const Nonce = require("../models/nonce.model.js");
 const ethers = require('ethers');
 const { getToken } = require("./tokens.js");
 const { errorResponse } = require("./error.js");
-const { gasEstimate } = require("./gasEstimate.js");
+const { estimateGas } = require("./gasEstimate.js");
 
 exports.upload = async (req, res) => {
 	console.log(`upload request: ${JSON.stringify(req.body)}`)
@@ -266,6 +266,17 @@ exports.upload = async (req, res) => {
 	console.log(`userBalance = ${userBalance}`);
 	if(userBalance.lt(priceWei)) {
 		errorResponse(req, res, null, 400, `User balance is less than current rate. Quoted amount: ${quote.tokenAmount}, current rate: ${priceWei}, userBalance: ${userBalance}`);
+		return;
+	}
+
+	// Calculate gas estimate
+	let gasEstimate = 0;
+	const bundlrAddress = '0x853758425e953739F5438fd6fd0Efe04A477b039';
+	try {
+		gasEstimate = await estimateGas(providerUri, token.address, bundlrAddress, priceWei);
+	}
+	catch(err) {
+		console.error(`Error occurred while estimating gas. ${err?.name}: ${err?.message}`);
 		return;
 	}
 
