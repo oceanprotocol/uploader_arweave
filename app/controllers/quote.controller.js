@@ -6,7 +6,6 @@ const Quote = require("../models/quote.model.js");
 const Nonce = require("../models/nonce.model.js");
 const { getToken } = require("./tokens.js");
 const { errorResponse } = require("./error.js");
-const { estimateGas } = require("./gasEstimate.js");
 
 const quoteidRegex = /^[a-fA-F0-9]{32}$/;
 
