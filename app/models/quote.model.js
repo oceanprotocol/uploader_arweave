@@ -104,7 +104,7 @@ Quote.getLink = (quoteId) => {
 
 Quote.getHistory = (userAddress) => {
 	const query = `
-	SELECT quote.quoteId, quote.status, quote.chainId, quote.tokenAddress, quote.tokenAmount, quote.approveAddress, files.transactionHash
+	SELECT 'arweave' AS 'type', quote.quoteId, quote.status, quote.chainId, quote.tokenAddress, quote.tokenAmount, quote.approveAddress, files.transactionHash
 	FROM quote
 	INNER JOIN files ON quote.quoteId = files.quoteId
 	WHERE quote.userAddress = ?;`;

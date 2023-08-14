@@ -221,6 +221,7 @@ describe("DBS Arweave Upload", function () {
                 const getHistoryResponse = await axios.get(`http://localhost:8081/getHistory?userAddress=${userWallet.address}&nonce=${nonce}&signature=${signature}`);
                 expect(getHistoryResponse.status).to.equal(200);
                 expect(getHistoryResponse.data[0]).contains.all.keys(
+                    "type",
                     "quoteId",
                     "status",
                     "chainId",

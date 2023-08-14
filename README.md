@@ -212,7 +212,8 @@ Returns:
 
 ```json
 [
-    {
+    {   
+       "type": "arweave",
        "quoteId": "23",
        "status": 400,
        "chainId": 80001,
