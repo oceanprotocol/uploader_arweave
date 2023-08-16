@@ -229,8 +229,7 @@ exports.create = async (req, res) => {
 		gasEstimate = await estimateGas(providerUri, token.address, bundlrAddress, priceWei);
 	}
 	catch(err) {
-		console.error(`Error occurred while estimating gas. ${err?.name}: ${err?.message}`);
-		return;
+		console.error(`Error occurred while estimating gas. Using default gas estimate. ${err?.name}: ${err?.message}`);
 	}
 
 	// Assume all payment chains support EIP-1559 transactions.
