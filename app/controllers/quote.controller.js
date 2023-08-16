@@ -453,7 +453,7 @@ exports.getHistory = async (req, res) => {
 		return;
 	}
 
-	if(signerAddress != userAddress) {
+	if(signerAddress !== userAddress) {
 		errorResponse(req, res, null, 403, "Invalid signature.");
 		return;
 	}
@@ -480,7 +480,7 @@ exports.getHistory = async (req, res) => {
 
 	try {
 		const history = Quote.getHistory(userAddress);
-		if(history == undefined) {
+		if(history === undefined) {
 			errorResponse(req, res, null, 404, "History not found.");
 			return;
 		}
