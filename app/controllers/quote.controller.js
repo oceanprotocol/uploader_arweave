@@ -6,6 +6,7 @@ const Quote = require("../models/quote.model.js");
 const Nonce = require("../models/nonce.model.js");
 const { getToken } = require("./tokens.js");
 const { errorResponse } = require("./error.js");
+const { estimateGas } = require("./gasEstimate.js");
 
 const quoteidRegex = /^[a-fA-F0-9]{32}$/;
 
@@ -220,6 +221,24 @@ exports.create = async (req, res) => {
 		errorResponse(req, res, err, 500, `Error occurred while getting fee data.`);
 		return;
 	}
+
+	// Calculate gas estimate
+	let gasEstimate = 0;
+	const bundlrAddress = '0x853758425e953739F5438fd6fd0Efe04A477b039';
+	try {
+		gasEstimate = await estimateGas(providerUri, token.address, bundlrAddress, priceWei);
+	}
+	catch(err) {
+		console.error(`Error occurred while estimating gas. ${err?.name}: ${err?.message}`);
+		return;
+	}
+
+	// Assume all payment chains support EIP-1559 transactions.
+	const gasFeeEstimate = gasEstimate.mul(feeData.maxFeePerGas.add(feeData.maxPriorityFeePerGas));
+	console.log(`gasFeeEstimate = ${gasFeeEstimate}`);
+
+	const gasFeePlusBuffer = gasFeeEstimate.add(gasFeeEstimate.div(process.env.GAS_PRICE_BUFFER ?? 10));
+	console.log(`gasFeePlusBuffer = ${gasFeePlusBuffer}`);
 
 	// Check server fee token balance exeeds fee estimate
 	let feeTokenBalance;
