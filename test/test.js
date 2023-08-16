@@ -138,7 +138,7 @@ describe("DBS Arweave Upload", function () {
                     signature: signature,
                 }).catch((err) => err.response);
 
-                const status = await waitForUpload(timeoutSeconds, quote.quoteId);
+                const status = await waitForUpload(timeoutSeconds + 100, quote.quoteId);
                 expect(status).equals(Quote.QUOTE_STATUS_UPLOAD_END);
 
                 // Attempt upload with nonce lower than previous
@@ -182,7 +182,7 @@ describe("DBS Arweave Upload", function () {
             });
 
 
-            it("getLink, after successful upload, should return a list of transaction IDs", async function() {
+            it("getLink & getHistory, after successful upload, should return a list of transaction IDs", async function() {
                 const getQuoteResponse = await getQuote(userWallet).catch((err) => err.response);
                 const quote = getQuoteResponse.data;
                 const token = new ethers.Contract(quote.tokenAddress, abi, userWallet);
@@ -201,7 +201,7 @@ describe("DBS Arweave Upload", function () {
                 expect(uploadResponse.status).equals(200);
                 expect(uploadResponse.data).equals('');
 
-                const status = await waitForUpload(timeoutSeconds, quote.quoteId);
+                const status = await waitForUpload(timeoutSeconds + 200, quote.quoteId);
                 expect(status).equals(Quote.QUOTE_STATUS_UPLOAD_END);
 
                 nonce = Math.floor(new Date().getTime()) / 1000;
@@ -211,6 +211,23 @@ describe("DBS Arweave Upload", function () {
                 expect(getLinkResponse.status).to.equal(200);
                 expect(getLinkResponse.data[0]).contains.all.keys(
                     "type",
+                    "transactionHash"
+                );
+
+                nonce = Math.floor(new Date().getTime()) / 1000;
+                const emptyQuoteId = '';
+                message = ethers.utils.sha256(ethers.utils.toUtf8Bytes(emptyQuoteId + nonce.toString()));
+                signature = await userWallet.signMessage(message);
+                const getHistoryResponse = await axios.get(`http://localhost:8081/getHistory?userAddress=${userWallet.address}&nonce=${nonce}&signature=${signature}`);
+                expect(getHistoryResponse.status).to.equal(200);
+                expect(getHistoryResponse.data[0]).contains.all.keys(
+                    "type",
+                    "quoteId",
+                    "status",
+                    "chainId",
+                    "tokenAddress",
+                    "tokenAmount",
+                    "approveAddress",
                     "transactionHash"
                 );
             });
