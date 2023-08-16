@@ -270,14 +270,13 @@ exports.upload = async (req, res) => {
 	}
 
 	// Calculate gas estimate
-	let gasEstimate = 0;
+	let gasEstimate = ethers.BigNumber.from(158751); // default in case estimate gas fails
 	const bundlrAddress = '0x853758425e953739F5438fd6fd0Efe04A477b039';
 	try {
 		gasEstimate = await estimateGas(providerUri, token.address, bundlrAddress, priceWei);
 	}
 	catch(err) {
-		console.error(`Error occurred while estimating gas. ${err?.name}: ${err?.message}`);
-		return;
+		console.error(`Error occurred while estimating gas. Using default gas estimate. ${err?.name}: ${err?.message}`);
 	}
 
 	// Calculate fee estimate
