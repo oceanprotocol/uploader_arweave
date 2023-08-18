@@ -497,9 +497,12 @@ exports.getHistory = async (req, res) => {
 		}
 		console.log(`${req.path} response: 200: ${JSON.stringify(history)}`);
 		let filteredHistory = history.filter((elem) => elem.userAddress === userAddress);
-
-		//Accept the first 25 elements
+		console.log('filteredHistory1: ', filteredHistory);
+		// Accept the first 25 elements
+		console.log('filteredHistory.length: ', filteredHistory.length);
+		console.log('filteredHistory.slice(0, 25): ', filteredHistory.slice(0, 25));
 		filteredHistory = filteredHistory.length > 25 ? filteredHistory.slice(0, 25) : filteredHistory;
+		console.log('filteredHistory: ', filteredHistory);
 		res.send(filteredHistory);
 	}
 	catch(err) {
