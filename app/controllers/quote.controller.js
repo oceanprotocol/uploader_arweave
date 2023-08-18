@@ -464,7 +464,7 @@ exports.getHistory = async (req, res) => {
 		return;
 	}
 
-	if(signerAddress !== userAddress) {
+	if(signerAddress.toLowerCase() !== userAddress) {
 		errorResponse(req, res, null, 403, "Invalid signature.");
 		return;
 	}
