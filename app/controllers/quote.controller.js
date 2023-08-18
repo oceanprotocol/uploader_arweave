@@ -464,7 +464,7 @@ exports.getHistory = async (req, res) => {
 		return;
 	}
 
-	if(signerAddress.toLowerCase() !== userAddress) {
+	if(signerAddress !== userAddress) {
 		errorResponse(req, res, null, 403, "Invalid signature.");
 		return;
 	}
@@ -496,13 +496,14 @@ exports.getHistory = async (req, res) => {
 			return;
 		}
 		console.log(`${req.path} response: 200: ${JSON.stringify(history)}`);
+
 		// Accept the first 25 elements
 		const historyArray = Array.from(history);
 		console.log('historyArray: ', historyArray);
-		// const filteredHistory = historyArray.filter((elem) => elem.userAddress.toLowerCase() === userAddress.toLowerCase());
-		console.log('history.length: ', historyArray.length);
-		console.log('history.slice(0, 25): ', historyArray.slice(0, 25));
-		const finalHistory = historyArray.length > 25 ? historyArray.slice(0, 25) : historyArray;
+		const filteredHistory = historyArray.filter((elem) => elem.userAddress.toLowerCase() === userAddress.toLowerCase());
+		console.log('history.length: ', filteredHistory.length);
+		console.log('history.slice(0, 25): ', filteredHistory.slice(0, 25));
+		const finalHistory = filteredHistory.length > 25 ? filteredHistory.slice(0, 25) : filteredHistory;
 		res.send(finalHistory);
 	}
 	catch(err) {
