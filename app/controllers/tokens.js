@@ -1,6 +1,6 @@
 // TODO: Update `confirms` fields
 let tokens;
-if(process.env.PRODUCTION = true){
+if(process.env.ARWEAVE_PRODUCTION = true){
 	tokens =[
 		// Mainnets, used with public Bundlr URIs. See for details https://docs.bundlr.network/docs/bundlers
 		{bundlrName: "ethereum", chainId: 1, symbol: "ETH", providerUrl: "https://cloudflare-eth.com/", tokenAddress: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", confirms: 1},
