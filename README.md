@@ -279,6 +279,7 @@ export BUNDLR_BATCH_SIZE=1 # default: 1 (chunk at a time)
 export BUNDLR_CHUNK_SIZE=524288 # default: 524288 (512 kB)
 export BUNDLR_PRICE_BUFFER=10 # percent, default: 10
 export GAS_PRICE_BUFFER=10 # percent, default: 10
+export PRODUCTION=false # Should be set to true when we launch in production
 
 npm start
 ```
