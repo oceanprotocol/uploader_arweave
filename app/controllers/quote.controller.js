@@ -496,7 +496,11 @@ exports.getHistory = async (req, res) => {
 			return;
 		}
 		console.log(`${req.path} response: 200: ${JSON.stringify(history)}`);
-		res.send(history);
+		let filteredHistory = history.filter((elem) => elem.userAddress === userAddress);
+
+		//Accept the first 25 elements
+		filteredHistory = filteredHistory.length > 25 ? filteredHistory.slice(0, 25) : filteredHistory;
+		res.send(filteredHistory);
 	}
 	catch(err) {
 		errorResponse(req, res, err, 500, "Error occurred while looking up status.");
