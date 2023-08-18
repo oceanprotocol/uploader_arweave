@@ -500,7 +500,7 @@ exports.getHistory = async (req, res) => {
 		// Accept the first 25 elements
 		const historyArray = Array.from(history);
 		console.log('historyArray: ', historyArray);
-		const filteredHistory = historyArray.filter((elem) => elem.userAddress.toLowerCase() === userAddress.toLowerCase());
+		const filteredHistory = historyArray.filter((elem) => elem.userAddress === userAddress);
 		console.log('history.length: ', filteredHistory.length);
 		console.log('history.slice(0, 25): ', filteredHistory.slice(0, 25));
 		const finalHistory = filteredHistory.length > 25 ? filteredHistory.slice(0, 25) : filteredHistory;
