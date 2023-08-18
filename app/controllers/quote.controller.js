@@ -6,7 +6,7 @@ const Quote = require("../models/quote.model.js");
 const Nonce = require("../models/nonce.model.js");
 const { getToken } = require("./tokens.js");
 const { errorResponse } = require("./error.js");
-const { gasEstimate } = require("./gasEstimate.js");
+const { estimateGas } = require("./gasEstimate.js");
 
 const quoteidRegex = /^[a-fA-F0-9]{32}$/;
 
@@ -221,6 +221,17 @@ exports.create = async (req, res) => {
 		errorResponse(req, res, err, 500, `Error occurred while getting fee data.`);
 		return;
 	}
+
+	// Calculate gas estimate
+	let gasEstimate = ethers.BigNumber.from(158751); // default in case estimate gas fails
+	const bundlrAddress = '0x853758425e953739F5438fd6fd0Efe04A477b039';
+	try {
+		gasEstimate = await estimateGas(providerUri, paymentToken.tokenAddress, bundlrAddress, priceWei);
+	}
+	catch(err) {
+		console.error(`Error occurred while estimating gas. Using default gas estimate. ${err?.name}: ${err?.message}`);
+	}
+
 	// Assume all payment chains support EIP-1559 transactions.
 	const gasFeeEstimate = gasEstimate.mul(feeData.maxFeePerGas.add(feeData.maxPriorityFeePerGas));
 	console.log(`gasFeeEstimate = ${gasFeeEstimate}`);
