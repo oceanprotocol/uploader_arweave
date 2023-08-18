@@ -499,10 +499,10 @@ exports.getHistory = async (req, res) => {
 		// Accept the first 25 elements
 		const historyArray = Array.from(history);
 		console.log('historyArray: ', historyArray);
-		const filteredHistory = historyArray.filter((elem) => elem.userAddress.toLowerCase() === userAddress.toLowerCase());
-		console.log('history.length: ', filteredHistory.length);
-		console.log('history.slice(0, 25): ', filteredHistory.slice(0, 25));
-		const finalHistory = filteredHistory.length > 25 ? filteredHistory.slice(0, 25) : filteredHistory;
+		// const filteredHistory = historyArray.filter((elem) => elem.userAddress.toLowerCase() === userAddress.toLowerCase());
+		console.log('history.length: ', historyArray.length);
+		console.log('history.slice(0, 25): ', historyArray.slice(0, 25));
+		const finalHistory = historyArray.length > 25 ? historyArray.slice(0, 25) : historyArray;
 		res.send(finalHistory);
 	}
 	catch(err) {
