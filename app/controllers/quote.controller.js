@@ -488,9 +488,7 @@ exports.getHistory = async (req, res) => {
 		let filteredHistory = history.filter((elem) => elem.userAddress === userAddress);
 
 		//Accept the first 25 elements
-		if (filteredHistory.length > 25) {
-			filteredHistory = filteredHistory.slice(0, 25)
-		}
+		filteredHistory = filteredHistory.length > 25 ? filteredHistory.slice(0, 25) : filteredHistory;
 		res.send(filteredHistory);
 	}
 	catch(err) {
