@@ -11,6 +11,10 @@ exports.getHistory = async (req, res) => {
 		return;
 	}
 	const nonce = req.query.nonce;
+    const pageSize = parseInt(req.query.page) || 25; 
+    const page = parseInt(req.query.page) || 1; // Default to the first page
+    const offset = (page - 1) * pageSize;
+
 	if(typeof nonce === "undefined") {
 		errorResponse(req, res, null, 400, "Missing nonce.");
 		return;
@@ -67,23 +71,18 @@ exports.getHistory = async (req, res) => {
 	}
 
 	try {
-		const history = Quote.getHistory(userAddress);
-		if(history === undefined) {
-			errorResponse(req, res, null, 404, "History not found.");
-			return;
-		}
+		const history = Quote.getHistory(userAddress, offset, pageSize);
+		if (history === undefined || history.length === 0) {
+            console.log('history not found')
+            errorResponse(req, res, null, 404, "History not found.");
+            return;
+        }
 		console.log(`${req.path} response: 200: ${JSON.stringify(history)}`);
 
-		// Accept the first 25 elements
-		const historyArray = Array.from(history);
-		console.log('historyArray: ', historyArray);
-		const filteredHistory = historyArray.filter((elem) => elem.userAddress === userAddress);
-		console.log('history.length: ', filteredHistory.length);
-		console.log('history.slice(0, 25): ', filteredHistory.slice(0, 25));
-		const finalHistory = filteredHistory.length > 25 ? filteredHistory.slice(0, 25) : filteredHistory;
 		res.send(finalHistory);
 	}
 	catch(err) {
+        console.error(err); 
 		errorResponse(req, res, err, 500, "Error occurred while looking up history.");
 	}
 };
