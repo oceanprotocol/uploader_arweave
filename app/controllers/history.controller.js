@@ -1,4 +1,7 @@
+const ethers = require('ethers');
 const { errorResponse } = require("./error.js");
+const Quote = require("../models/quote.model.js");
+const Nonce = require("../models/nonce.model.js");
 
 exports.getHistory = async (req, res) => {
 	console.log(`getHistory request: ${JSON.stringify(req.query)}`)
