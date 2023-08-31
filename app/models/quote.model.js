@@ -102,14 +102,16 @@ Quote.getLink = (quoteId) => {
 	return sql.prepare(query).all([quoteId]);
 };
 
-Quote.getHistory = (userAddress) => {
-	const query = `
-	SELECT 'arweave' AS 'type', quote.quoteId, quote.userAddress, quote.status, quote.chainId, quote.tokenAddress, quote.tokenAmount, quote.approveAddress, files.transactionHash
-	FROM quote
-	INNER JOIN files ON quote.quoteId = files.quoteId
-	WHERE quote.userAddress = ?;`;
+Quote.getHistory = (userAddress, offset, limit) => {
+    const query = `
+    SELECT 'arweave' AS 'type', quote.quoteId, quote.userAddress, quote.status, quote.chainId, quote.tokenAddress, quote.tokenAmount, quote.approveAddress, files.transactionHash
+    FROM quote
+    INNER JOIN files ON quote.quoteId = files.quoteId
+    WHERE quote.userAddress = ?
+    LIMIT ? OFFSET ?;`;
 
-	return sql.prepare(query).all([userAddress]);
+    return sql.prepare(query).all([userAddress, limit, offset]);
 };
 
 module.exports = Quote;
+
