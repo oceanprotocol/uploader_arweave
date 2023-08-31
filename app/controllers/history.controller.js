@@ -79,7 +79,7 @@ exports.getHistory = async (req, res) => {
         }
 		console.log(`${req.path} response: 200: ${JSON.stringify(history)}`);
 
-		res.send(finalHistory);
+		res.send(history);
 	}
 	catch(err) {
         console.error(err); 
