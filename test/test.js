@@ -232,6 +232,34 @@ describe("DBS Arweave Upload", function () {
                 );
             });
 
+            it("should return paginated results", async function() {
+                const pageSize = 5;
+                let currentPage = 1;
+        
+                // Generate nonce and signature
+                let nonce = Math.floor(new Date().getTime() / 1000);
+                const message = ethers.utils.sha256(ethers.utils.toUtf8Bytes('' + nonce.toString()));
+                const signature = await userWallet.signMessage(message);
+        
+                const firstPageResponse = await axios.get(`http://localhost:8081/getHistory?page=${currentPage}&pageSize=${pageSize}&userAddress=${userWallet.address}&nonce=${nonce}&signature=${signature}`)
+                    .catch((err) => err.response);
+                
+                expect(firstPageResponse.status).to.equal(200);
+                expect(firstPageResponse.data.length).to.equal(pageSize);
+        
+                // Checking pagination, moving to next page
+                currentPage += 1;
+        
+                const secondPageResponse = await axios.get(`http://localhost:8081/getHistory?page=${currentPage}&pageSize=${pageSize}&userAddress=${userWallet.address}&nonce=${nonce}&signature=${signature}`)
+                    .catch((err) => err.response);
+        
+                expect(secondPageResponse.status).to.equal(200);
+                expect(secondPageResponse.data.length).to.equal(pageSize);
+        
+                // Validate that the data in the first and second pages are different
+                expect(firstPageResponse.data).to.not.deep.equal(secondPageResponse.data);
+            });
+
             it("upload, with large file, should successfully upload file to arweave", async function() {
                 if (process.env.ENABLE_EXPENSIVE_TESTS == "true") {
                     const timeoutSeconds = 3600;
