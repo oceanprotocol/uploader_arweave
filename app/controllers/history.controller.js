@@ -11,7 +11,7 @@ exports.getHistory = async (req, res) => {
 		return;
 	}
 	const nonce = req.query.nonce;
-    const pageSize = parseInt(req.query.page) || 25; 
+    const pageSize = parseInt(req.query.pageSize) || 25; 
     const page = parseInt(req.query.page) || 1; // Default to the first page
     const offset = (page - 1) * pageSize;
 

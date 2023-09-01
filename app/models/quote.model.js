@@ -103,14 +103,26 @@ Quote.getLink = (quoteId) => {
 };
 
 Quote.getHistory = (userAddress, offset, limit) => {
+	console.log('getHistory parameters:', userAddress, limit, offset);
+	const integerLimit = Number.isInteger(limit) ? limit : 25; 
+	const integerOffset = Number.isInteger(offset) ? offset : 0; 
+
     const query = `
     SELECT 'arweave' AS 'type', quote.quoteId, quote.userAddress, quote.status, quote.chainId, quote.tokenAddress, quote.tokenAmount, quote.approveAddress, files.transactionHash
     FROM quote
     INNER JOIN files ON quote.quoteId = files.quoteId
     WHERE quote.userAddress = ?
-    LIMIT ? OFFSET ?;`;
+    LIMIT ${integerLimit} OFFSET ${integerOffset};
+	`;
 
-    return sql.prepare(query).all([userAddress, limit, offset]);
+	console.log('Executing SQL:', query);
+	console.log('With parameters:', [userAddress, integerLimit, integerOffset]);
+
+
+    const result = sql.prepare(query).all([userAddress]);
+    console.log('Query Result:', result);
+    
+    return result;
 };
 
 module.exports = Quote;
