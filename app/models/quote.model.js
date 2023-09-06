@@ -107,6 +107,19 @@ Quote.getHistory = (userAddress, offset, limit) => {
 	const integerLimit = Number.isInteger(limit) ? limit : 25; 
 	const integerOffset = Number.isInteger(offset) ? offset : 0; 
 
+	// Query to get total count
+	const countQuery = `
+	SELECT COUNT(*)
+	FROM quote
+	INNER JOIN files ON quote.quoteId = files.quoteId
+	WHERE quote.userAddress = ?;
+	`;
+
+	const totalCount = sql.prepare(countQuery).get([userAddress])["COUNT(*)"];
+	console.log('Total count:', totalCount)
+	const maxPages = Math.ceil(totalCount / integerLimit);
+	console.log('Max pages:', maxPages)
+
     const query = `
     SELECT 'arweave' AS 'type', quote.quoteId, quote.userAddress, quote.status, quote.chainId, quote.tokenAddress, quote.tokenAmount, quote.approveAddress, files.transactionHash
     FROM quote
@@ -122,7 +135,11 @@ Quote.getHistory = (userAddress, offset, limit) => {
     const result = sql.prepare(query).all([userAddress]);
     console.log('Query Result:', result);
     
-    return result;
+    return {
+		type: 'arweave',
+		maxPages,
+		data: result
+	  };
 };
 
 module.exports = Quote;
