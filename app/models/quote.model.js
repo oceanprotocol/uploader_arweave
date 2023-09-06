@@ -117,7 +117,7 @@ Quote.getHistory = (userAddress, offset, limit) => {
 
 	const totalCount = sql.prepare(countQuery).get([userAddress])["COUNT(*)"];
 	console.log('Total count:', totalCount)
-    const maxPages = Math.ceil(totalCount / integerLimit);
+	const maxPages = Math.ceil(totalCount / integerLimit);
 	console.log('Max pages:', maxPages)
 
     const query = `
