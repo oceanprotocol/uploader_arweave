@@ -107,12 +107,12 @@ Quote.getHistory = (userAddress, offset, limit) => {
 	const integerLimit = Number.isInteger(limit) ? limit : 25; 
 	const integerOffset = Number.isInteger(offset) ? offset : 0; 
 
-	  // Query to get total count
-	  const countQuery = `
-	  SELECT COUNT(*)
-	  FROM quote
-	  INNER JOIN files ON quote.quoteId = files.quoteId
-	  WHERE quote.userAddress = ?;
+	// Query to get total count
+	const countQuery = `
+	SELECT COUNT(*)
+	FROM quote
+	INNER JOIN files ON quote.quoteId = files.quoteId
+	WHERE quote.userAddress = ?;
 	`;
 
 	const totalCount = sql.prepare(countQuery).get([userAddress])["COUNT(*)"];
