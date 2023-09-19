@@ -56,19 +56,22 @@ app.listen(PORT, "0.0.0.0", () => {
 	}
 });
 
-const register = () => {
+const register = async () => {
 	const baseURL = new URL(process.env.SELF_URI);
 	if (!baseURL.port) {
 		baseURL.port = PORT || 8081;
 	}
 	const url = baseURL.toString();
 	console.log(`Registering with DBS at ${process.env.DBS_URI} as ${url}`);
+    const userWallet = new ethers.Wallet(process.env.PRIVATE_KEY);
+	const signedMsg = await userWallet.signMessage(url);
 
 	axios.post(`${process.env.DBS_URI}/register`, {
 		type: "arweave",
 		description: "File storage on Arweave",
 		url,
 		payment: getAcceptedPaymentDetails(),
+		signature: signedMsg
 	})
 	.then((response) => {
 		console.log("Successfully registered with DBS:", response.data);
