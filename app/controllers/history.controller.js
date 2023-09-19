@@ -72,7 +72,7 @@ exports.getHistory = async (req, res) => {
 
 	try {
 		const history = Quote.getHistory(userAddress, offset, pageSize);
-		if (history === undefined || history.length === 0) {
+		if (history === undefined) {
             console.log('history not found')
             errorResponse(req, res, null, 404, "History not found.");
             return;
