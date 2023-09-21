@@ -347,22 +347,43 @@ exports.upload = async (req, res) => {
 	// Pull payment from user's account using transferFrom(userAddress, amount)
 	const confirms = paymentToken.confirms;
 	try {
-		console.log('token transferFrom', userAddress, wallet.address, priceWei.toString(10));
+		console.log('token transferFrom', userAddress, wallet.address, priceWei.toString());
 
-		await (await token.transferFrom(userAddress, wallet.address, priceWei, {
+		const txResponse = await token.transferFrom(userAddress, wallet.address, priceWei, {
 			maxPriorityFeePerGas: priorityFeePerGas,
 			maxFeePerGas: feePerGas
-		  })).wait(confirms);
+		});
+
+		try {
+			await txResponse.wait(confirms);
+		} catch (err) {
+			console.error(`Error occurred during transaction confirmation: ${err?.name}: ${err?.message}`);
+			console.log(`txResponse = ${JSON.stringify(txResponse)}`);
+	
+			// Wait for a short duration (e.g., 30 seconds)
+			await new Promise(res => setTimeout(res, 30000));
+	
+			// Check the status of the transaction on-chain
+			const txReceipt = await provider.getTransactionReceipt(txResponse.hash);
+			console.log(`txReceipt = ${JSON.stringify(txReceipt)}`);
+	
+			if (txReceipt && txReceipt.status === 1) {
+				console.log("Transaction was successful on-chain even after error during confirmation.");
+			} else {
+				console.error("Transaction failed both during confirmation and on-chain.");
+				throw err;
+			}
+		}
 	}
 	catch(err) {
 		console.error(`Error occurred while pulling payment from user address: ${err?.name}: ${err?.message}`);
-		try {
-			Quote.setStatus(quoteId, Quote.QUOTE_STATUS_PAYMENT_PULL_FAILED);
-		}
-		catch(err) {
-			console.error(`Error occurred while setting status to Quote.QUOTE_STATUS_PAYMENT_PULL_FAILED: ${err?.name}: ${err?.message}`);
-		}
-		return;
+		// try {
+		// 	Quote.setStatus(quoteId, Quote.QUOTE_STATUS_PAYMENT_PULL_FAILED);
+		// }
+		// catch(err) {
+		// 	console.error(`Error occurred while setting status to Quote.QUOTE_STATUS_PAYMENT_PULL_FAILED: ${err?.name}: ${err?.message}`);
+		// }
+		// return;
 	}
 
 	try {
