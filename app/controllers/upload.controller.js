@@ -400,6 +400,7 @@ exports.upload = async (req, res) => {
 			maxPriorityFeePerGas: priorityFeePerGas,
 			maxFeePerGas: feePerGas
 		})
+		console.log(`withdraw txResponse = ${JSON.stringify(txResponse)}`);
 		try {
 			await txResponse.wait(confirms);
 		} catch (err) {
