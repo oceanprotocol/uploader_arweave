@@ -8,6 +8,7 @@ const ethers = require('ethers');
 const { getToken } = require("./tokens.js");
 const { errorResponse } = require("./error.js");
 const { estimateGas } = require("./gasEstimate.js");
+const MIN_GAS_FEE_POLYGON = 30000000000; // 30 gwei
 
 exports.upload = async (req, res) => {
 	console.log(`upload request: ${JSON.stringify(req.body)}`)
@@ -276,7 +277,7 @@ exports.upload = async (req, res) => {
 		gasEstimate = await estimateGas(providerUri, token.address, bundlrAddress, priceWei);
 	}
 	catch(err) {
-		console.error(`Error occurred while estimating gas. Using default gas estimate. ${err?.name}: ${err?.message}`);
+		console.log(`Using default gas estimate. ${err?.name}: ${err?.message}`);
 	}
 
 	// Calculate fee estimate
@@ -322,10 +323,36 @@ exports.upload = async (req, res) => {
 		return;
 	}
 
+	// Fetch Gas price
+	let feePerGas;
+	let priorityFeePerGas;
+	try {
+		const feeHistory = await provider.getFeeData();
+		priorityFeePerGas = Number(feeHistory.maxPriorityFeePerGas?.toString() || MIN_GAS_FEE_POLYGON);
+		feePerGas = Number(feeHistory.maxFeePerGas?.toString() || MIN_GAS_FEE_POLYGON);
+
+		// Check gas fees are above minimum
+		priorityFeePerGas = Math.max(priorityFeePerGas, MIN_GAS_FEE_POLYGON);
+		feePerGas = Math.max(feePerGas, MIN_GAS_FEE_POLYGON);
+		console.log(`priorityFeePerGas = ${priorityFeePerGas}`);
+		console.log(`feePerGas = ${feePerGas}`);
+	} catch(err) {
+		console.error(`Using default gas price. Error occurred while fetching gas price: ${err?.name}: ${err?.message}`);
+		priorityFeePerGas = 300000000000 // default values
+		feePerGas = 300000000000 // default values
+		console.log(`priorityFeePerGas = ${priorityFeePerGas}`);
+		console.log(`feePerGas = ${feePerGas}`);
+	}
+
 	// Pull payment from user's account using transferFrom(userAddress, amount)
 	const confirms = paymentToken.confirms;
 	try {
-		await (await token.transferFrom(userAddress, wallet.address, priceWei)).wait(confirms);
+		console.log('token transferFrom', userAddress, wallet.address, priceWei.toString(10));
+
+		await (await token.transferFrom(userAddress, wallet.address, priceWei, {
+			maxPriorityFeePerGas: priorityFeePerGas,
+			maxFeePerGas: feePerGas
+		  })).wait(confirms);
 	}
 	catch(err) {
 		console.error(`Error occurred while pulling payment from user address: ${err?.name}: ${err?.message}`);
