@@ -7,7 +7,6 @@ const Nonce = require("../models/nonce.model.js");
 const ethers = require('ethers');
 const { getToken } = require("./tokens.js");
 const { errorResponse } = require("./error.js");
-const { estimateGas } = require("./gasEstimate.js");
 const MIN_GAS_FEE_POLYGON = 30000000000; // 30 gwei
 
 exports.upload = async (req, res) => {
@@ -186,8 +185,10 @@ exports.upload = async (req, res) => {
 	let bundlrPriceWei;
 	let priceWei;
 	try {
+		console.log('get quote from bundlr')
 		bundlrPriceWei = await bundlr.getPrice(quote.size)
 		priceWei = ethers.BigNumber.from(bundlrPriceWei.toString(10));
+		console.log(`bundlr quote PriceWei = ${bundlrPriceWei}`);
 	}
 	catch(err) {
 		errorResponse(req, res, err, 500, "Could not query price from payment processor.");
@@ -202,6 +203,7 @@ exports.upload = async (req, res) => {
 	// Create provider
 	let provider;
 	try {
+		console.log('create provider')
 		provider = ethers.getDefaultProvider(providerUri);
 		console.log(`network = ${JSON.stringify(await provider.getNetwork())}`);
 	}
@@ -243,13 +245,14 @@ exports.upload = async (req, res) => {
 	// Check allowance
 	let allowance;
 	try {
+		console.log('check allowance')
 		allowance = await token.allowance(userAddress, wallet.address);
+		console.log(`allowance = ${allowance}`);
 	}
 	catch(err) {
 		errorResponse(req, res, err, 500, `Error occured while checking allowance.`);
 		return;
 	}
-	console.log(`allowance = ${allowance}`);
 	if(allowance.lt(priceWei)) {
 		errorResponse(req, res, null, 400, `Allowance is less than current rate. Quoted amount: ${quote.tokenAmount}, current rate: ${priceWei}, allowance: ${allowance}`);
 		return;
@@ -258,57 +261,18 @@ exports.upload = async (req, res) => {
 	// Check that user has sufficient funds
 	let userBalance;
 	try {
+		console.log('Check that user has sufficient funds')
 		userBalance = await token.balanceOf(userAddress);
+		console.log(`userBalance = ${userBalance}`);
 	}
 	catch(err) {
 		errorResponse(req, res, err, 500, `Error occurred while checking user token balance.`);
 		return;
 	}
-	console.log(`userBalance = ${userBalance}`);
 	if(userBalance.lt(priceWei)) {
 		errorResponse(req, res, null, 400, `User balance is less than current rate. Quoted amount: ${quote.tokenAmount}, current rate: ${priceWei}, userBalance: ${userBalance}`);
 		return;
 	}
-
-	// Calculate gas estimate
-	let gasEstimate = ethers.BigNumber.from(158751); // default in case estimate gas fails
-	const bundlrAddress = '0x853758425e953739F5438fd6fd0Efe04A477b039';
-	try {
-		gasEstimate = await estimateGas(providerUri, token.address, bundlrAddress, priceWei);
-	}
-	catch(err) {
-		console.log(`Using default gas estimate.`);
-	}
-
-	// Calculate fee estimate
-	let feeData;
-	try {
-		feeData = await provider.getFeeData();
-	}
-	catch(err) {
-		errorResponse(req, res, err, 500, `Error occurred while getting fee data.`);
-		return;
-	}
-	// Assume all payment chains support EIP-1559 transactions.
-	const feeEstimate = gasEstimate.mul(feeData.maxFeePerGas.add(feeData.maxPriorityFeePerGas));
-	console.log(`feeEstimate = ${feeEstimate}`);
-
-	// Check server fee token balance exeeds fee estimate
-	let feeTokenBalance;
-	try {
-		feeTokenBalance = await wallet.getBalance();
-	}
-	catch(err) {
-		errorResponse(req, res, err, 500, `Error occurred while getting server fee token balance.`);
-		return;
-	}
-	console.log(`feeTokenBalance = ${feeTokenBalance}`);
-	if(feeEstimate.gte(feeTokenBalance)) {
-		errorResponse(req, res, null, 503, `Estimated fees to process payment exceed fee token reserves. feeEstimate: ${feeEstimate}, feeTokenBalance: ${feeTokenBalance}`);
-		return;
-	}
-
-	// TODO: Consider Checking Bundlr account balance
 
 	// send 200
 	console.log(`${req.path} response: 200`);
@@ -327,6 +291,7 @@ exports.upload = async (req, res) => {
 	let feePerGas;
 	let priorityFeePerGas;
 	try {
+		console.log('Fetch Gas price')
 		const feeHistory = await provider.getFeeData();
 		priorityFeePerGas = Number(feeHistory.maxPriorityFeePerGas?.toString() || MIN_GAS_FEE_POLYGON);
 		feePerGas = Number(feeHistory.maxFeePerGas?.toString() || MIN_GAS_FEE_POLYGON);
@@ -356,6 +321,7 @@ exports.upload = async (req, res) => {
 		console.log(`transferFrom txResponse = ${JSON.stringify(txResponse)}`);
 
 		try {
+			console.log('await tx confirmation')
 			await txResponse.wait(confirms);
 			console.log('txResponse confirmed')
 		} catch (err) {
@@ -396,32 +362,18 @@ exports.upload = async (req, res) => {
 		return;
 	}
 
+
 	// Unwrap payment token (ex. WETH -> ETH)
 	try {
-		const txResponse = await token.withdraw(priceWei, {
-			maxPriorityFeePerGas: priorityFeePerGas,
-			maxFeePerGas: feePerGas
-		})
-		console.log(`withdraw txResponse = ${JSON.stringify(txResponse)}`);
-		try {
-			await txResponse.wait(confirms);
-		} catch (err) {
-			console.error(`Error occurred during withdraw transaction confirmation: ${err?.name}: ${err?.message}`);
-	
-			// Wait for a short duration (e.g., 30 seconds)
-			await new Promise(res => setTimeout(res, 30000));
-	
-			// Check the status of the transaction on-chain
-			const txReceipt = await provider.getTransactionReceipt(txResponse.hash);
-			console.log(`txReceipt = ${JSON.stringify(txReceipt)}`);
-	
-			if (txReceipt && txReceipt.status === 1) {
-				console.log("Transaction was successful on-chain even after error during confirmation.");
-			} else {
-				console.error("Transaction failed both during confirmation and on-chain.");
-				throw err;
-			}
+		async function performWithdraw() {
+			const txResponse = await token.withdraw(priceWei, {
+				maxPriorityFeePerGas: priorityFeePerGas,
+				maxFeePerGas: feePerGas
+			});
+			console.log(`withdraw txResponse = ${JSON.stringify(txResponse)}`);
 		}
+
+		performWithdraw();
 	}
 	catch(err) {
 		console.error(`Error occurred while unwrapping payment: ${err?.name}: ${err?.message}`);
@@ -434,19 +386,11 @@ exports.upload = async (req, res) => {
 		return;
 	}
 
-	try {
-		console.log('Set status QUOTE_STATUS_PAYMENT_UNWRAP_SUCCESS')
-		Quote.setStatus(quoteId, Quote.QUOTE_STATUS_PAYMENT_UNWRAP_SUCCESS);
-	}
-	catch(err) {
-		console.error(`Error occurred while setting status to Quote.QUOTE_STATUS_PAYMENT_UNWRAP_SUCCESS: ${err?.name}: ${err?.message}`);
-		return;
-	}
-
 	// Fund server's Bundlr Account
 	try {
 		console.log('Fund Bundlr Account')
 		await bundlr.fund(bundlrPriceWei);
+		console.log('bundlr funded successfully')
 	}
 	catch(err) {
 		console.error(`Error occurred while funding Bundlr account: ${err?.name}: ${err?.message}`);
@@ -510,8 +454,12 @@ exports.upload = async (req, res) => {
 
 				// Set the Arweave tags: https://github.com/ArweaveTeam/arweave-standards/blob/master/best-practices/BP-105.md
 				const arweaveTags = contentType ? [{name: "Content-Type", value: contentType}] : [];
+				console.log('arweaveTags', arweaveTags)
 
 				const uploader = bundlr.uploader.chunkedUploader;
+				console.log('process.env.BUNDLR_CHUNK_SIZE', process.env.BUNDLR_CHUNK_SIZE)
+				console.log('process.env.BUNDLR_BATCH_SIZE', process.env.BUNDLR_BATCH_SIZE)
+
 				uploader.setChunkSize(process.env.BUNDLR_CHUNK_SIZE || 524288); // Default: 512 kB
 				uploader.setBatchSize(process.env.BUNDLR_BATCH_SIZE || 1); // Default: 1 chunk at a time
 
@@ -522,6 +470,8 @@ exports.upload = async (req, res) => {
 				});
 				uploader.on("done", async (finishRes) => {
 					const transactionId = finishRes.data.id;
+					console.log('upload done')
+					console.log('transactionId', transactionId)
 					try {
 						File.setHash(quoteId, index, transactionId);
 					}
@@ -531,14 +481,6 @@ exports.upload = async (req, res) => {
 						return;
 					}
 
-					// perform HEAD request to Arweave Gateway to verify that file uploaded successfully
-					try {
-						await axios.head(process.env.ARWEAVE_GATEWAY + transactionId, {timeout: 10000});
-					}
-					catch(err) {
-						console.warn(`Unable to verify file via Arweave gateway. transaction id: ${transactionId}, error: ${err?.response?.status}`);
-					}
-
 					resolve(transactionId);
 					return;
 				});
@@ -546,7 +488,9 @@ exports.upload = async (req, res) => {
 				const transactionOptions = {tags: arweaveTags};
 				try {
 					// Download each chunk and immediately upload to Bundlr without storing to disk.
+					console.log('Download each chunk and immediately upload to Bundlr without storing to disk.')
 					await uploader.uploadData(Buffer.from(res.data, "binary"), transactionOptions);
+					console.log('uploader.uploadData complete')
 				}
 				catch(err) {
 					console.error(`Error occurred while uploading file: ${err?.name}: ${err?.message}. CID = ${file}, file index = ${index}`);
@@ -563,6 +507,7 @@ exports.upload = async (req, res) => {
 		});
 	})).then(() => {
 		try {
+			console.log('Set status QUOTE_STATUS_UPLOAD_END')
 			Quote.setStatus(quoteId, Quote.QUOTE_STATUS_UPLOAD_END);
 		}
 		catch(err) {
