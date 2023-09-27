@@ -357,6 +357,7 @@ exports.upload = async (req, res) => {
 
 		try {
 			await txResponse.wait(confirms);
+			console.log('txResponse confirmed')
 		} catch (err) {
 			console.error(`Error occurred during transferFrom transaction confirmation: ${err?.name}: ${err?.message}`);
 	
@@ -377,16 +378,17 @@ exports.upload = async (req, res) => {
 	}
 	catch(err) {
 		console.error(`Error occurred while pulling payment from user address: ${err?.name}: ${err?.message}`);
-		// try {
-		// 	Quote.setStatus(quoteId, Quote.QUOTE_STATUS_PAYMENT_PULL_FAILED);
-		// }
-		// catch(err) {
-		// 	console.error(`Error occurred while setting status to Quote.QUOTE_STATUS_PAYMENT_PULL_FAILED: ${err?.name}: ${err?.message}`);
-		// }
-		// return;
+		try {
+			Quote.setStatus(quoteId, Quote.QUOTE_STATUS_PAYMENT_PULL_FAILED);
+		}
+		catch(err) {
+			console.error(`Error occurred while setting status to Quote.QUOTE_STATUS_PAYMENT_PULL_FAILED: ${err?.name}: ${err?.message}`);
+		}
+		return;
 	}
 
 	try {
+		console.log('Set status QUOTE_STATUS_PAYMENT_PULL_SUCCESS')
 		Quote.setStatus(quoteId, Quote.QUOTE_STATUS_PAYMENT_PULL_SUCCESS);
 	}
 	catch(err) {
@@ -433,6 +435,7 @@ exports.upload = async (req, res) => {
 	}
 
 	try {
+		console.log('Set status QUOTE_STATUS_PAYMENT_UNWRAP_SUCCESS')
 		Quote.setStatus(quoteId, Quote.QUOTE_STATUS_PAYMENT_UNWRAP_SUCCESS);
 	}
 	catch(err) {
@@ -442,6 +445,7 @@ exports.upload = async (req, res) => {
 
 	// Fund server's Bundlr Account
 	try {
+		console.log('Fund Bundlr Account')
 		await bundlr.fund(bundlrPriceWei);
 	}
 	catch(err) {
@@ -456,6 +460,7 @@ exports.upload = async (req, res) => {
 	}
 
 	try {
+		console.log('Set status QUOTE_STATUS_UPLOAD_START')
 		Quote.setStatus(quoteId, Quote.QUOTE_STATUS_UPLOAD_START);
 	}
 	catch(err) {
@@ -479,6 +484,7 @@ exports.upload = async (req, res) => {
 			const ipfsFile = process.env.IPFS_GATEWAY + file.substring(7);
 
 			// download file
+			console.log('download file')
 			await axios({
 				method: "get",
 				url: ipfsFile,
@@ -487,7 +493,9 @@ exports.upload = async (req, res) => {
 			.then(async res => {
 				// download started
 				const contentType = res.headers['content-type'];
+				console.log('download contentType', contentType)
 				const actualLength = parseInt(res.headers['content-length']);
+				console.log('download actualLength', actualLength)
 
 				if(actualLength) {
 					if(actualLength > quotedFileLength) {
