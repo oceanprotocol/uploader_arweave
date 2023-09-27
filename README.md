@@ -1,7 +1,7 @@
-# dbs_arweave
+# Ocean Uploader Arweave Microservice
 
 A microservice for uploading files to Arweave. To be used with
-[Ocean Protocol Decentralized Storage Backend](https://github.com/oceanprotocol/decentralized_storage_backend).
+[Ocean Uploader Backend](https://github.com/oceanprotocol/uploader_backend).
 
 - [🔌 Endpoints](#endpoints)
   - [🏷️ getQuote](#getquote)
@@ -229,7 +229,7 @@ Returns:
 ## Register
 
 Every 10 minutes (configurable), Arweave microservice should register itself to
-DBS, using the `register` endpoint. DBS_URI will be defined as env.
+Uploader Backend, using the `register` endpoint. DBS_URI will be defined as env.
 
 POST  DBS_URI/register
 
@@ -358,5 +358,5 @@ Released under the Apache 2.0 License.
 
 ## Associated Projects
 
-- [DBS Filecoin microservice](https://github.com/oceanprotocol/dbs_filecoin)
-- [OCEAN Decentralized Backend Storage](https://github.com/oceanprotocol/decentralized_storage_backend)
+- [Uploader Filecoin microservice](https://github.com/oceanprotocol/uploader_filecoin)
+- [Ocean Uploader Backend](https://github.com/oceanprotocol/uploader_backend)
