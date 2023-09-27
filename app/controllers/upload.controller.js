@@ -310,7 +310,6 @@ exports.upload = async (req, res) => {
 	}
 
 	// Pull payment from user's account using transferFrom(userAddress, amount)
-	const confirms = paymentToken.confirms;
 	try {
 		console.log('token transferFrom', userAddress, wallet.address, priceWei.toString());
 
@@ -319,28 +318,6 @@ exports.upload = async (req, res) => {
 			maxFeePerGas: feePerGas
 		});
 		console.log(`transferFrom txResponse = ${JSON.stringify(txResponse)}`);
-
-		try {
-			console.log('await tx confirmation')
-			await txResponse.wait(confirms);
-			console.log('txResponse confirmed')
-		} catch (err) {
-			console.error(`Error occurred during transferFrom transaction confirmation: ${err?.name}: ${err?.message}`);
-	
-			// Wait for a short duration (e.g., 30 seconds)
-			await new Promise(res => setTimeout(res, 30000));
-	
-			// Check the status of the transaction on-chain
-			const txReceipt = await provider.getTransactionReceipt(txResponse.hash);
-			console.log(`txReceipt = ${JSON.stringify(txReceipt)}`);
-	
-			if (txReceipt && txReceipt.status === 1) {
-				console.log("Transaction was successful on-chain even after error during confirmation.");
-			} else {
-				console.error("Transaction failed both during confirmation and on-chain.");
-				throw err;
-			}
-		}
 	}
 	catch(err) {
 		console.error(`Error occurred while pulling payment from user address: ${err?.name}: ${err?.message}`);
@@ -436,7 +413,7 @@ exports.upload = async (req, res) => {
 			})
 			.then(async res => {
 				// download started
-				const contentType = res.headers['content-type'];
+				onst contentType = res.headers['content-type'];
 				console.log('download contentType', contentType)
 				const actualLength = parseInt(res.headers['content-length']);
 				console.log('download actualLength', actualLength)
