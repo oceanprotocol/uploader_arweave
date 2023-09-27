@@ -413,7 +413,7 @@ exports.upload = async (req, res) => {
 			})
 			.then(async res => {
 				// download started
-				onst contentType = res.headers['content-type'];
+				const contentType = res.headers['content-type'];
 				console.log('download contentType', contentType)
 				const actualLength = parseInt(res.headers['content-length']);
 				console.log('download actualLength', actualLength)
