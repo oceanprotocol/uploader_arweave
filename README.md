@@ -27,7 +27,7 @@ A microservice for uploading files to Arweave. To be used with
 Clone the repository and navigate to the project directory:
 
 ```bash
-git clone https://github.com/oceanprotocol/dbs_arweave.git
+git clone https://github.com/oceanprotocol/uploader_arweave.git
 cd arweave-upload
 ```
 
@@ -52,6 +52,7 @@ npm start
 ## Endpoints
 
 ### getQuote
+
 Description: Gets a quote in order to store some files
 
 Path: POST /getQuote
@@ -60,17 +61,14 @@ Arguments:
 
 ```json
 {
-    "type": "arweave",
-    "files": [
-                {"length":2343545},
-                {"length":2343545},
-            ],
-    "duration": 4353545453,
-    "payment": {
-        "chainId": 1,
-        "tokenAddress": "0xWETH_on_ETHERUEM"
-    },
-    "userAddress": "0x456"
+  "type": "arweave",
+  "files": [{ "length": 2343545 }, { "length": 2343545 }],
+  "duration": 4353545453,
+  "payment": {
+    "chainId": 1,
+    "tokenAddress": "0xWETH_on_ETHERUEM"
+  },
+  "userAddress": "0x456"
 }
 ```
 
@@ -87,11 +85,11 @@ Returns:
 
 ```json
 {
-    "tokenAmount": 500,
-    "approveAddress": "0x123",
-    "chainId": 1,
-    "tokenAddress": "0xWETH_on_MAINNET",
-    "quoteId": "xxxx"
+  "tokenAmount": 500,
+  "approveAddress": "0x123",
+  "chainId": 1,
+  "tokenAddress": "0xWETH_on_MAINNET",
+  "quoteId": "xxxx"
 }
 ```
 
@@ -103,8 +101,8 @@ Where:
 - tokenAddress: token that will be used to make the payment
 - quoteId: backend server will generate a quoteId
 
-
 ### upload
+
 Description: Upload some files
 
 Path: POST /upload
@@ -113,13 +111,10 @@ Input:
 
 ```json
 {
-    "quoteId": "23",
-    "nonce": 12345.12345,
-    "signature": "0x2222",
-    "files": [
-        "ipfs://xxxx",
-        "ipfs://yyyy"
-    ]
+  "quoteId": "23",
+  "nonce": 12345.12345,
+  "signature": "0x2222",
+  "files": ["ipfs://xxxx", "ipfs://yyyy"]
 }
 ```
 
@@ -129,6 +124,7 @@ Returns: `200 OK` if all the pre-checks pass. Upload occurs asynchronously.
 Call `getStatus` to monitor status.
 
 ### getStatus
+
 Description: Gets status for a job
 
 Path: POST /getStatus?quoteId=xxx
@@ -137,23 +133,24 @@ Returns:
 
 ```json
 {
-    "status": 0
+  "status": 0
 }
 ```
 
 Where:
 
-Status | Status Description
--- | --
-0 | No such quote
-1-99 | Waiting for files to be uploaded by the user
-100-199 | Processing payment
-200-299 | Processing payment failure modes
-300-399 | Uploading files to storage
-400 | Upload done
-401-499 | Upload failure modes
+| Status  | Status Description                           |
+| ------- | -------------------------------------------- |
+| 0       | No such quote                                |
+| 1-99    | Waiting for files to be uploaded by the user |
+| 100-199 | Processing payment                           |
+| 200-299 | Processing payment failure modes             |
+| 300-399 | Uploading files to storage                   |
+| 400     | Upload done                                  |
+| 401-499 | Upload failure modes                         |
 
 ### getLink
+
 Description: Gets DDO files object for a job
 
 Path: POST /getLink?quoteId=xxx&nonce=1&signature=0xXXXXX
@@ -162,11 +159,10 @@ Input:
 
 ```json
 {
-    "quoteId": "23",
-    "nonce": 12345.12345,
-    "signature": "0x2222"
+  "quoteId": "23",
+  "nonce": 12345.12345,
+  "signature": "0x2222"
 }
-
 ```
 
 Where:
@@ -179,14 +175,15 @@ Returns:
 
 ```json
 [
-    {
-       "type": "arweave",
-       "transactionHash": "xxxx"
-    }
+  {
+    "type": "arweave",
+    "transactionHash": "xxxx"
+  }
 ]
 ```
 
 ### getHistory
+
 Description: Gets history quotes for a certain user
 
 Path: GET /getHistory?userAddress=xxx&nonce=1&signature=0xXXXXX
@@ -195,11 +192,10 @@ Input:
 
 ```json
 {
-    "userAddress": "0x1234",
-    "nonce": 12345.12345,
-    "signature": "0x2222"
+  "userAddress": "0x1234",
+  "nonce": 12345.12345,
+  "signature": "0x2222"
 }
-
 ```
 
 Where:
@@ -212,17 +208,17 @@ Returns:
 
 ```json
 [
-    {   
-       "type": "arweave",
-       "quoteId": "23",
-       "userAddress": "0x111",
-       "status": 400,
-       "chainId": 80001,
-       "tokenAddress": "0x222",
-       "tokenAmount": "999999999",
-       "approveAddress": "0x1234",
-       "transactionHash": "xxxx"
-    }
+  {
+    "type": "arweave",
+    "quoteId": "23",
+    "userAddress": "0x111",
+    "status": 400,
+    "chainId": 80001,
+    "tokenAddress": "0x222",
+    "tokenAmount": "999999999",
+    "approveAddress": "0x1234",
+    "transactionHash": "xxxx"
+  }
 ]
 ```
 
@@ -231,32 +227,29 @@ Returns:
 Every 10 minutes (configurable), Arweave microservice should register itself to
 Uploader Backend, using the `register` endpoint. DBS_URI will be defined as env.
 
-POST  DBS_URI/register
+POST DBS_URI/register
 
 ```json
 {
-    "type": "arweave",
-    "description":  "File storage on Arweave",
-    "url": "http://microservice.url",
-    "payment":
-            [
-                {
-                    "chainId": 1,
-                    "acceptedTokens":
-                        [
-                            { "OCEAN": "0xWETH_on_ETHEREUM" } ,
-                            { "DAI": "0xOCEAN_ON_ETHEREUM" }
-                        ]
-                },
-                {
-                    "chainId": 137,
-                    "acceptedTokens":
-                        [
-                            { "OCEAN": "0xWMATIC_on_POLYGON" },
-                            { "DAI": "0xOCEAN_ON_POLYGON" }
-                        ]
-                }
-            ]
+  "type": "arweave",
+  "description": "File storage on Arweave",
+  "url": "http://microservice.url",
+  "payment": [
+    {
+      "chainId": 1,
+      "acceptedTokens": [
+        { "OCEAN": "0xWETH_on_ETHEREUM" },
+        { "DAI": "0xOCEAN_ON_ETHEREUM" }
+      ]
+    },
+    {
+      "chainId": 137,
+      "acceptedTokens": [
+        { "OCEAN": "0xWMATIC_on_POLYGON" },
+        { "DAI": "0xOCEAN_ON_POLYGON" }
+      ]
+    }
+  ]
 }
 ```
 
@@ -316,15 +309,15 @@ The tests use public testnets: Goerli and Mumbai
 > Don't run multiple instances of the tests at the same time. It will cause
 > race conditions with token approvals.
 
-* Tests: https://github.com/MantisClone/arweave-upload/blob/main/test
-* Config: https://github.com/MantisClone/arweave-upload/blob/main/.github/workflows/ci.yml
+- Tests: https://github.com/MantisClone/arweave-upload/blob/main/test
+- Config: https://github.com/MantisClone/arweave-upload/blob/main/.github/workflows/ci.yml
 
 ### Expensive, large upload test
 
 The large upload test is run periodically (quarterly) via Github Actions. It
 requires over 4 WMATIC in the client account (TEST_PRIVATE_KEY).
 
-* Config: https://github.com/MantisClone/arweave-upload/blob/main/.github/workflows/ci_expensive.yml
+- Config: https://github.com/MantisClone/arweave-upload/blob/main/.github/workflows/ci_expensive.yml
 
 ### Example Curl Commands
 
@@ -345,8 +338,7 @@ Please open issues on github if you need support of have any questions.
 
 ## Roadmap
 
-Stay tuned for more integrations and services. Follow the issues on github to see the latest development plans.  
-
+Stay tuned for more integrations and services. Follow the issues on github to see the latest development plans.
 
 ## Contributing
 
