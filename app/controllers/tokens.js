@@ -12,7 +12,7 @@ const allTokens = [
   {
     bundlrName: 'matic',
     chainId: 137,
-    symbol: 'MATIC',
+    symbol: 'WMATIC',
     providerUrl: 'https://polygon-rpc.com',
     tokenAddress: '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270',
     confirms: 30
@@ -53,7 +53,7 @@ const allTokens = [
   {
     bundlrName: 'matic',
     chainId: 80001,
-    symbol: 'MATIC',
+    symbol: 'WMATIC',
     providerUrl: 'https://rpc-mumbai.maticvigil.com/',
     tokenAddress: '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889',
     confirms: 1
@@ -81,7 +81,7 @@ const mainnetTokens = [
   {
     bundlrName: 'matic',
     chainId: 137,
-    symbol: 'MATIC',
+    symbol: 'WMATIC',
     providerUrl: 'https://polygon-rpc.com',
     tokenAddress: '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270',
     confirms: 30
