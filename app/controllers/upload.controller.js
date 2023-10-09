@@ -1,5 +1,5 @@
 const Bundlr = require('@bundlr-network/client')
-import mime from 'mime'
+const mime = require('mime')
 
 const axios = require('axios')
 const File = require('../models/upload.model.js')
@@ -449,6 +449,7 @@ exports.upload = async (req, res) => {
 
             // Infer MIME type from filename
             const inferredContentType = mime.getType(ipfsFile.split('/').pop() || '')
+            console.log('inferredContentType', inferredContentType)
 
             // If the MIME type inferred is reliable (not falsey), use it, otherwise fallback to the server-provided MIME type.
             const finalContentType = inferredContentType || contentTypeFromHeaders
