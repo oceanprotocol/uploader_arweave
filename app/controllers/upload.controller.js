@@ -1,6 +1,5 @@
 const Bundlr = require('@bundlr-network/client')
-npm install mime
-
+import mime from 'mime'
 
 const axios = require('axios')
 const File = require('../models/upload.model.js')
@@ -443,17 +442,17 @@ exports.upload = async (req, res) => {
         })
           .then(async (res) => {
             // download started
-            const contentTypeFromHeaders = res.headers['content-type'];
-            console.log('download contentType', contentTypeFromHeaders);
-            const actualLength = parseInt(res.headers['content-length']);
-            console.log('download actualLength', actualLength);
+            const contentTypeFromHeaders = res.headers['content-type']
+            console.log('download contentType', contentTypeFromHeaders)
+            const actualLength = parseInt(res.headers['content-length'])
+            console.log('download actualLength', actualLength)
 
             // Infer MIME type from filename
-            const inferredContentType = mime.getType(ipfsFile.split('/').pop() || '');
+            const inferredContentType = mime.getType(ipfsFile.split('/').pop() || '')
 
             // If the MIME type inferred is reliable (not falsey), use it, otherwise fallback to the server-provided MIME type.
-            const finalContentType = inferredContentType || contentTypeFromHeaders;
-            console.log('Used contentType:', finalContentType);
+            const finalContentType = inferredContentType || contentTypeFromHeaders
+            console.log('Used contentType:', finalContentType)
 
             if (actualLength) {
               if (actualLength > quotedFileLength) {
@@ -469,9 +468,9 @@ exports.upload = async (req, res) => {
 
             // Set the Arweave tags: https://github.com/ArweaveTeam/arweave-standards/blob/master/best-practices/BP-105.md
             const arweaveTags = finalContentType
-            ? [{ name: 'Content-Type', value: finalContentType }]
-            : [];
-            console.log('arweaveTags', arweaveTags);
+              ? [{ name: 'Content-Type', value: finalContentType }]
+              : []
+            console.log('arweaveTags', arweaveTags)
 
             const uploader = bundlr.uploader.chunkedUploader
             console.log('process.env.BUNDLR_CHUNK_SIZE', process.env.BUNDLR_CHUNK_SIZE)
