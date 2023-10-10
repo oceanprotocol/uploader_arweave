@@ -417,7 +417,7 @@ exports.upload = async (req, res) => {
   }
 
   Promise.all(
-    files.map((file, index) => {
+    files.map((fileObj, index) => {
       return new Promise(async (resolve, reject) => {
         // Get quoted file length
         let quotedFileLength
@@ -425,40 +425,35 @@ exports.upload = async (req, res) => {
           quotedFileLength = File.get(quoteId, index).length
         } catch (err) {
           console.error(
-            `Error occurred while reading quoted file length from database: ${err?.name}: ${err?.message}. CID = ${file}, file index = ${index}`
+            `Error occurred while reading quoted file length from database: ${err?.name}: ${err?.message}. CID = ${fileObj.ipfs_uri}, file index = ${index}`
           )
           reject(Quote.QUOTE_STATUS_UPLOAD_INTERNAL_ERROR)
           return
         }
-
-        const ipfsFile = process.env.IPFS_GATEWAY + file.substring(7)
+        console.log('fileObj', fileObj)
+        const ipfsFile = process.env.IPFS_GATEWAY + fileObj.ipfs_uri.substring(7)
+        console.log('ipfsFile', ipfsFile)
 
         // download file
         console.log('download file')
         await axios({
           method: 'get',
           url: ipfsFile,
-          responseType: 'arraybuffer' // Download in chunks, stored in memory
+          responseType: 'arraybuffer'
         })
           .then(async (res) => {
             // download started
-            const contentTypeFromHeaders = res.headers['content-type']
-            console.log('download contentType', contentTypeFromHeaders)
             const actualLength = parseInt(res.headers['content-length'])
             console.log('download actualLength', actualLength)
 
-            // Infer MIME type from filename
-            const inferredContentType = mime.getType(ipfsFile.split('/').pop() || '')
-            console.log('inferredContentType', inferredContentType)
-
-            // If the MIME type inferred is reliable (not falsey), use it, otherwise fallback to the server-provided MIME type.
-            const finalContentType = inferredContentType || contentTypeFromHeaders
+            // Use the content_type property directly from the fileObj
+            const finalContentType = fileObj.content_type
             console.log('Used contentType:', finalContentType)
 
             if (actualLength) {
               if (actualLength > quotedFileLength) {
                 console.error(
-                  `Actual file length exceeds quoted length. CID = ${file}, file index = ${index}, quoted length = ${quotedFileLength}, actual length ${actualLength}`
+                  `Actual file length exceeds quoted length. CID = ${fileObj.ipfs_uri}, file index = ${index}, quoted length = ${quotedFileLength}, actual length ${actualLength}`
                 )
                 reject(Quote.QUOTE_STATUS_UPLOAD_ACTUAL_FILE_LEN_EXCEEDS_QUOTE)
                 return
@@ -467,7 +462,6 @@ exports.upload = async (req, res) => {
               console.warn('Warning: Unknown file length. Uploading blindly.')
             }
 
-            // Set the Arweave tags: https://github.com/ArweaveTeam/arweave-standards/blob/master/best-practices/BP-105.md
             const arweaveTags = finalContentType
               ? [{ name: 'Content-Type', value: finalContentType }]
               : []
@@ -478,11 +472,11 @@ exports.upload = async (req, res) => {
             console.log('process.env.BUNDLR_BATCH_SIZE', process.env.BUNDLR_BATCH_SIZE)
 
             uploader.setChunkSize(process.env.BUNDLR_CHUNK_SIZE || 524288) // Default: 512 kB
-            uploader.setBatchSize(process.env.BUNDLR_BATCH_SIZE || 1) // Default: 1 chunk at a time
+            uploader.setBatchSize(process.env.BUNDLR_BATCH_SIZE || 1)
 
             uploader.on('chunkError', (e) => {
               console.error(
-                `Error uploading chunk number ${e.id} - ${e.res.statusText}. CID = ${file}, file index = ${index}`
+                `Error uploading chunk number ${e.id} - ${e.res.statusText}. CID = ${fileObj.ipfs_uri}, file index = ${index}`
               )
               reject(Quote.QUOTE_STATUS_UPLOAD_UPLOAD_FAILED)
               return
@@ -495,7 +489,7 @@ exports.upload = async (req, res) => {
                 File.setHash(quoteId, index, transactionId)
               } catch (err) {
                 console.error(
-                  `Error occurred while writing file transaction id to database: ${err?.name}: ${err?.message}. CID = ${file}, file index = ${index}`
+                  `Error occurred while writing file transaction id to database: ${err?.name}: ${err?.message}. CID = ${fileObj.ipfs_uri}, file index = ${index}`
                 )
                 reject(Quote.QUOTE_STATUS_UPLOAD_INTERNAL_ERROR)
                 return
@@ -507,10 +501,6 @@ exports.upload = async (req, res) => {
 
             const transactionOptions = { tags: arweaveTags }
             try {
-              // Download each chunk and immediately upload to Bundlr without storing to disk.
-              console.log(
-                'Download each chunk and immediately upload to Bundlr without storing to disk.'
-              )
               await uploader.uploadData(
                 Buffer.from(res.data, 'binary'),
                 transactionOptions
@@ -518,16 +508,15 @@ exports.upload = async (req, res) => {
               console.log('uploader.uploadData complete')
             } catch (err) {
               console.error(
-                `Error occurred while uploading file: ${err?.name}: ${err?.message}. CID = ${file}, file index = ${index}`
+                `Error occurred while uploading file: ${err?.name}: ${err?.message}. CID = ${fileObj.ipfs_uri}, file index = ${index}`
               )
-              // TODO: Consider separate status for insufficient funds.
               reject(Quote.QUOTE_STATUS_UPLOAD_UPLOAD_FAILED)
               return
             }
           })
           .catch((err) => {
             console.error(
-              `Error occurred while downloading file ${file}, index ${index}: ${err?.name}: ${err?.message}`
+              `Error occurred while downloading file ${fileObj.ipfs_uri}, index ${index}: ${err?.name}: ${err?.message}`
             )
             reject(Quote.QUOTE_STATUS_UPLOAD_DOWNLOAD_FAILED)
             return
