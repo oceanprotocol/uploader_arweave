@@ -51,13 +51,14 @@ exports.upload = async (req, res) => {
 
   const cidRegex =
     /^(Qm[1-9A-HJ-NP-Za-km-z]{44,}|b[A-Za-z2-7]{58,}|B[A-Z2-7]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[0-9A-F]{50,})$/i
+
   for (let i = 0; i < files.length; i++) {
-    if (typeof files[i] !== 'string') {
+    const file = files[i]
+    if (typeof file !== 'object' || !file.ipfs_uri || !file.content_type) {
       errorResponse(req, res, null, 400, `Invalid files field on index ${i}.`)
       return
     }
-    // TODO: validate URL format better
-    if (!files[i].startsWith('ipfs://')) {
+    if (!file.ipfs_uri.startsWith('ipfs://')) {
       errorResponse(
         req,
         res,
@@ -67,7 +68,7 @@ exports.upload = async (req, res) => {
       )
       return
     }
-    if (!cidRegex.test(files[i].substring(7))) {
+    if (!cidRegex.test(file.ipfs_uri.substring(7))) {
       errorResponse(req, res, null, 400, `Invalid CID on index ${i}.`)
       return
     }
