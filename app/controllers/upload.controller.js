@@ -292,6 +292,24 @@ exports.upload = async (req, res) => {
     console.log(
       `Allowance is less than current rate. Current rate: ${priceWei}, allowance: ${allowance}`
     )
+    const checkAllowance = async () => {
+      while (true) {
+        try {
+          console.log('check allowance again')
+          allowance = await token.allowance(userAddress, wallet.address)
+          console.log(`allowance = ${allowance}`)
+
+          if (allowance.gte(priceWei)) {
+            break // Exit the loop if condition is met
+          }
+        } catch (err) {
+          console.log(`Error occurred while checking allowance.`)
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, 2000)) // Wait for 2 seconds
+      }
+    }
+    checkAllowance()
   }
 
   // Check that user has sufficient funds
