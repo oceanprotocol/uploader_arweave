@@ -306,7 +306,7 @@ exports.create = async (req, res) => {
   const quoteId = crypto.randomBytes(16).toString('hex')
 
   // save data in database
-  const buffer = BigNumber.from('1.2')
+  const buffer = ethers.BigNumber.from('2')
   console.log('buffer', buffer)
   console.log('uploadFeePlusBuffer', uploadFeePlusBuffer)
   const tokenAmount = uploadFeePlusBuffer.mul(buffer).add(gasFeePlusBuffer).toString()
