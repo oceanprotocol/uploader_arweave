@@ -204,8 +204,9 @@ exports.upload = async (req, res) => {
   try {
     console.log('get quote from bundlr')
     bundlrPriceWei = await bundlr.getPrice(quote.size)
-    priceWei = ethers.BigNumber.from(bundlrPriceWei.toString(10))
     console.log(`bundlr quote PriceWei = ${bundlrPriceWei}`)
+    priceWei = ethers.BigNumber.from(bundlrPriceWei.toString(10))
+    console.log('priceWei', priceWei)
   } catch (err) {
     errorResponse(req, res, err, 500, 'Could not query price from payment processor.')
     return
@@ -277,21 +278,20 @@ exports.upload = async (req, res) => {
   let allowance
   try {
     console.log('check allowance')
+    console.log('user address: ', userAddress)
+    console.log('wallet address: ', wallet.address)
     allowance = await token.allowance(userAddress, wallet.address)
     console.log(`allowance = ${allowance}`)
   } catch (err) {
-    errorResponse(req, res, err, 500, `Error occured while checking allowance.`)
-    return
+    console.log(`Error occured while checking allowance.`)
   }
+  console.log(
+    `comparing current current bundlr price: ${priceWei} to  allowance: ${allowance}`
+  )
   if (allowance.lt(priceWei)) {
-    errorResponse(
-      req,
-      res,
-      null,
-      400,
-      `Allowance is less than current rate. Quoted amount: ${quote.tokenAmount}, current rate: ${priceWei}, allowance: ${allowance}`
+    console.log(
+      `Allowance is less than current rate. Current rate: ${priceWei}, allowance: ${allowance}`
     )
-    return
   }
 
   // Check that user has sufficient funds
@@ -346,9 +346,7 @@ exports.upload = async (req, res) => {
     console.log(`priorityFeePerGas = ${priorityFeePerGas}`)
     console.log(`feePerGas = ${feePerGas}`)
   } catch (err) {
-    console.error(
-      `Using default gas price. Error occurred while fetching gas price: ${err?.name}: ${err?.message}`
-    )
+    console.log(`Using default gas price. ${err?.name}: ${err?.message}`)
     priorityFeePerGas = 300000000000 // default values
     feePerGas = 300000000000 // default values
     console.log(`priorityFeePerGas = ${priorityFeePerGas}`)
