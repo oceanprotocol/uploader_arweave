@@ -323,6 +323,7 @@ exports.create = async (req, res) => {
     approveAddress: wallet.address,
     files: file_lengths
   })
+  console.log('quote', quote)
 
   try {
     const data = Quote.create(quote)
