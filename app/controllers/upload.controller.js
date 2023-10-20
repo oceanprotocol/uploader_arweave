@@ -54,7 +54,7 @@ exports.upload = async (req, res) => {
 
   for (let i = 0; i < files.length; i++) {
     const file = files[i]
-    if (typeof file !== 'object' || !file.ipfs_uri || !file.content_type) {
+    if (typeof file !== 'object' || !file.ipfs_uri) {
       errorResponse(req, res, null, 400, `Invalid files field on index ${i}.`)
       return
     }
