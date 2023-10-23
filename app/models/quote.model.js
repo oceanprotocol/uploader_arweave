@@ -1,17 +1,17 @@
-const sql = require("./db.js");
+const sql = require('./db.js')
 
 // constructor
-const Quote = function(quote) {
-	this.quoteId = quote.quoteId;
-	this.status = quote.status;
-	this.created = quote.created;
-	this.chainId = quote.chainId;
-	this.tokenAddress = quote.tokenAddress;
-	this.userAddress = quote.userAddress;
-	this.tokenAmount = quote.tokenAmount;
-	this.approveAddress = quote.approveAddress;
-	this.files = quote.files;
-};
+const Quote = function (quote) {
+  this.quoteId = quote.quoteId
+  this.status = quote.status
+  this.created = quote.created
+  this.chainId = quote.chainId
+  this.tokenAddress = quote.tokenAddress
+  this.userAddress = quote.userAddress
+  this.tokenAmount = quote.tokenAmount
+  this.approveAddress = quote.approveAddress
+  this.files = quote.files
+}
 
 // status constants
 // 0	No such quote
@@ -22,125 +22,124 @@ const Quote = function(quote) {
 // 400	Upload done
 // 401-499	Upload failure modes
 
-Quote.QUOTE_STATUS_NONE = 0;
-Quote.QUOTE_STATUS_WAITING = 1;
-Quote.QUOTE_STATUS_PAYMENT_START = 100;
-Quote.QUOTE_STATUS_PAYMENT_PULL_SUCCESS = 101;
-Quote.QUOTE_STATUS_PAYMENT_UNWRAP_SUCCESS = 102;
-Quote.QUOTE_STATUS_PAYMENT_PULL_FAILED = 200;
-Quote.QUOTE_STATUS_PAYMENT_UNWRAP_FAILED = 201;
-Quote.QUOTE_STATUS_PAYMENT_PUSH_FAILED = 202;
-Quote.QUOTE_STATUS_UPLOAD_START = 300;
-Quote.QUOTE_STATUS_UPLOAD_END = 400;
-Quote.QUOTE_STATUS_UPLOAD_INTERNAL_ERROR = 401;
-Quote.QUOTE_STATUS_UPLOAD_ACTUAL_FILE_LEN_EXCEEDS_QUOTE = 402;
-Quote.QUOTE_STATUS_UPLOAD_DOWNLOAD_FAILED = 403;
-Quote.QUOTE_STATUS_UPLOAD_UPLOAD_FAILED = 404;
+Quote.QUOTE_STATUS_NONE = 0
+Quote.QUOTE_STATUS_WAITING = 1
+Quote.QUOTE_STATUS_PAYMENT_START = 100
+Quote.QUOTE_STATUS_PAYMENT_PULL_SUCCESS = 101
+Quote.QUOTE_STATUS_PAYMENT_UNWRAP_SUCCESS = 102
+Quote.QUOTE_STATUS_PAYMENT_PULL_FAILED = 200
+Quote.QUOTE_STATUS_PAYMENT_UNWRAP_FAILED = 201
+Quote.QUOTE_STATUS_PAYMENT_PUSH_FAILED = 202
+Quote.QUOTE_STATUS_UPLOAD_START = 300
+Quote.QUOTE_STATUS_UPLOAD_END = 400
+Quote.QUOTE_STATUS_UPLOAD_INTERNAL_ERROR = 401
+Quote.QUOTE_STATUS_UPLOAD_ACTUAL_FILE_LEN_EXCEEDS_QUOTE = 402
+Quote.QUOTE_STATUS_UPLOAD_DOWNLOAD_FAILED = 403
+Quote.QUOTE_STATUS_UPLOAD_UPLOAD_FAILED = 404
 
 Quote.create = (newQuote) => {
-	const params = [
-		newQuote.quoteId,
-		newQuote.status,
-		newQuote.created,
-		newQuote.chainId,
-		newQuote.tokenAddress,
-		newQuote.userAddress,
-		newQuote.tokenAmount,
-		newQuote.approveAddress,
-	];
+  const params = [
+    newQuote.quoteId,
+    newQuote.status,
+    newQuote.created,
+    newQuote.chainId,
+    newQuote.tokenAddress,
+    newQuote.userAddress,
+    newQuote.tokenAmount,
+    newQuote.approveAddress
+  ]
 
-	const quote_sql = "INSERT INTO quote (quoteId, status, created, chainId, tokenAddress, userAddress, tokenAmount, approveAddress) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+  const quote_sql =
+    'INSERT INTO quote (quoteId, status, created, chainId, tokenAddress, userAddress, tokenAmount, approveAddress) VALUES (?, ?, ?, ?, ?, ?, ?, ?);'
 
-	sql.prepare(quote_sql).run(params)
+  sql.prepare(quote_sql).run(params)
 
-	// generate files sql
-	const placeholders = newQuote.files.map(() => "(?, ?, ?)").join(', ');
-	const files_sql = 'INSERT INTO files ("quoteId", "index", "length") VALUES ' + placeholders;
+  // generate files sql
+  const placeholders = newQuote.files.map(() => '(?, ?, ?)').join(', ')
+  const files_sql =
+    'INSERT INTO files ("quoteId", "index", "length") VALUES ' + placeholders
 
-	let files_params = [];
-	newQuote.files.forEach((length, index) => {
-		const arr = [newQuote.quoteId, index, length];
-		files_params = [...files_params, ...arr];
-	});
+  let files_params = []
+  newQuote.files.forEach((length, index) => {
+    const arr = [newQuote.quoteId, index, length]
+    files_params = [...files_params, ...arr]
+  })
 
-	sql.prepare(files_sql).run(files_params);
+  sql.prepare(files_sql).run(files_params)
 
-	delete newQuote.status;
-	delete newQuote.created;
-	delete newQuote.userAddress;
-	delete newQuote.files;
+  delete newQuote.status
+  delete newQuote.created
+  delete newQuote.userAddress
+  delete newQuote.files
 
-	return newQuote;
+  return newQuote
 }
 
-
 Quote.get = (quoteId) => {
-	const query = `
+  const query = `
 		SELECT *, (SELECT SUM(length) FROM files WHERE quoteId = ?) AS 'size'
 		FROM quote
 		WHERE quoteId = ?;
-	`;
-	return sql.prepare(query).get([quoteId, quoteId]);
-};
+	`
+  return sql.prepare(query).get([quoteId, quoteId])
+}
 
 Quote.getStatus = (quoteId) => {
-	const query = "SELECT status FROM quote WHERE quoteId = ?;";
-	return sql.prepare(query).get([quoteId]);
-};
+  const query = 'SELECT status FROM quote WHERE quoteId = ?;'
+  return sql.prepare(query).get([quoteId])
+}
 
 Quote.setStatus = (quoteId, status) => {
-	const query = "UPDATE quote SET status = ? WHERE quoteId = ?;"
-	sql.prepare(query).run([status, quoteId]);
-};
+  const query = 'UPDATE quote SET status = ? WHERE quoteId = ?;'
+  sql.prepare(query).run([status, quoteId])
+}
 
 Quote.getLink = (quoteId) => {
-	const query = `SELECT 'arweave' AS 'type', transactionHash
+  const query = `SELECT 'arweave' AS 'type', transactionHash
 		FROM files
 		WHERE quoteId = ?
-		ORDER BY "index" ASC;`;
+		ORDER BY "index" ASC;`
 
-	return sql.prepare(query).all([quoteId]);
-};
+  return sql.prepare(query).all([quoteId])
+}
 
 Quote.getHistory = (userAddress, offset, limit) => {
-	console.log('getHistory parameters:', userAddress, limit, offset);
-	const integerLimit = Number.isInteger(limit) ? limit : 25; 
-	const integerOffset = Number.isInteger(offset) ? offset : 0; 
+  console.log('getHistory parameters:', userAddress, limit, offset)
+  const integerLimit = Number.isInteger(limit) ? limit : 25
+  const integerOffset = Number.isInteger(offset) ? offset : 0
 
-	// Query to get total count
-	const countQuery = `
+  // Query to get total count
+  const countQuery = `
 	SELECT COUNT(*)
 	FROM quote
 	INNER JOIN files ON quote.quoteId = files.quoteId
-	WHERE quote.userAddress = ?;
-	`;
+	WHERE quote.userAddress = ? AND quote.status != 1;
+	`
 
-	const totalCount = sql.prepare(countQuery).get([userAddress])["COUNT(*)"];
-	console.log('Total count:', totalCount)
-	const maxPages = Math.ceil(totalCount / integerLimit);
-	console.log('Max pages:', maxPages)
+  const totalCount = sql.prepare(countQuery).get([userAddress])['COUNT(*)']
+  console.log('Total count:', totalCount)
+  const maxPages = Math.ceil(totalCount / integerLimit)
+  console.log('Max pages:', maxPages)
 
-    const query = `
+  const query = `
     SELECT 'arweave' AS 'type', quote.quoteId, quote.userAddress, quote.status, quote.chainId, quote.tokenAddress, quote.tokenAmount, quote.approveAddress, files.transactionHash
     FROM quote
     INNER JOIN files ON quote.quoteId = files.quoteId
-    WHERE quote.userAddress = ?
+    WHERE quote.userAddress = ? AND quote.status != 1
     LIMIT ${integerLimit} OFFSET ${integerOffset};
-	`;
+	`
 
-	console.log('Executing SQL:', query);
-	console.log('With parameters:', [userAddress, integerLimit, integerOffset]);
+  console.log('Executing SQL:', query)
+  console.log('With parameters:', [userAddress, integerLimit, integerOffset])
 
+  const result = sql.prepare(query).all([userAddress])
+  console.log('Query Result:', result)
 
-    const result = sql.prepare(query).all([userAddress]);
-    console.log('Query Result:', result);
-    
-    return {
-		type: 'arweave',
-		maxPages,
-		data: result
-	  };
-};
+  return {
+    type: 'arweave',
+    maxPages,
+    data: result
+  }
+}
 
-module.exports = Quote;
-
+module.exports = Quote
