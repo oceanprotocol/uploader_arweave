@@ -136,6 +136,7 @@ Quote.getHistory = (userAddress, offset, limit) => {
     FROM quote
     INNER JOIN files ON quote.quoteId = files.quoteId
     WHERE quote.userAddress = ? AND quote.status != 1
+    ORDER BY quote.created DESC
     LIMIT ${integerLimit} OFFSET ${integerOffset};
 	`
 
