@@ -122,10 +122,21 @@ Quote.getHistory = (userAddress, offset, limit) => {
   console.log('Max pages:', maxPages)
 
   const query = `
-    SELECT 'arweave' AS 'type', quote.quoteId, quote.userAddress, quote.status, quote.chainId, quote.tokenAddress, quote.tokenAmount, quote.approveAddress, files.transactionHash
+    SELECT 
+      'arweave' AS 'type',
+      quote.quoteId, 
+      quote.created,
+      quote.userAddress, 
+      quote.status, 
+      quote.chainId, 
+      quote.tokenAddress, 
+      quote.tokenAmount, 
+      quote.approveAddress, 
+      files.transactionHash
     FROM quote
     INNER JOIN files ON quote.quoteId = files.quoteId
     WHERE quote.userAddress = ? AND quote.status != 1
+    ORDER BY quote.created DESC
     LIMIT ${integerLimit} OFFSET ${integerOffset};
 	`
 
